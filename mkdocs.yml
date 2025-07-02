@@ -1,0 +1,34 @@
+site_name: GenStgoryAI
+site_description: Your AI-powered story assistant.
+strict: true
+
+repo_name: fengchuimailang/genstoryai
+repo_url: https://github.com/fengchuimailang/genstoryai
+
+
+nav:
+  - Introduction: index.md
+  - install.md
+  - contributing.md 
+  - changlog.md
+  - Examples:
+      - examples/index.md
+
+extra:
+  # hide the "Made with Material for MkDocs" message
+  generator: false
+
+theme:
+  name: "material"
+  features:
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - navigation.path
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tracking
+    - toc.follow
