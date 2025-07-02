@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Module",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/genstoryai_backend/genstoryai_backend/main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/backend/genstoryai_backend",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend/genstoryai_backend"
+            }
+        },
+        {
+            "name": "Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/genstoryai_backend/genstoryai_backend/main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/backend/genstoryai_backend",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend/genstoryai_backend"
+            }
+        }
+    ]
+}

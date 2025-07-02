@@ -1,10 +1,13 @@
+import os
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
 import dotenv
-import os
+import asyncio
 
-from genstoryai_backend.models.character import CharacterBase, CharacterCreate
+
+
+from genstoryai_backend.models.character import CharacterCreate
 from genstoryai_backend.utils.i18n import trans 
 
 dotenv.load_dotenv()
@@ -30,3 +33,11 @@ character_agent = Agent(
     output_type=CharacterCreate,
     system_prompt=trans("You are a helpful assistant that can help with character creation."),
 )
+
+
+async def generate_character(user_prompt: str) -> CharacterCreate:
+    """generate character by user_prompt"""
+    result = await character_agent.run(user_prompt)
+    if hasattr(result, 'output'):
+        return result.output
+    return result

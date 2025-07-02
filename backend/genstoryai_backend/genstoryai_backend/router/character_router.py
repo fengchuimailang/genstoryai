@@ -1,11 +1,11 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 
 from genstoryai_backend.database.db import get_session
 from genstoryai_backend.models.character import CharacterCreate,CharacterRead,CharacterUpdate
 from genstoryai_backend.database.crud.character_crud import create_character, get_character, get_characters, update_character, delete_character
-from genstoryai_backend.agent.character_agent import character_agent
+from genstoryai_backend.agent.character_agent import generate_character
 
 router = APIRouter(
     prefix="/character",
@@ -14,9 +14,9 @@ router = APIRouter(
 )
 
 @router.post("/generate/",response_model=CharacterCreate)
-async def generate_character_endpoint(user_prompt: str = None):
+async def generate_character_endpoint(user_prompt: str = Query(None)):
     """generate character by user_prompt"""
-    return character_agent.run(user_prompt)
+    return await generate_character(user_prompt)
 
 @router.post("/create/",response_model=CharacterCreate)
 async def create_character_endpoint(character: CharacterCreate, db: Session = Depends(get_session)):
@@ -45,4 +45,11 @@ async def update_character_endpoint(character_id: int, character: CharacterUpdat
         raise HTTPException(status_code=404, detail="Character not found")
     return db_character
 
+
+@router.delete("/{character_id}")
+async def delete_character_endpoint(character_id: int, db: Session = Depends(get_session)):
+    """delete character by character_id"""
+    if delete_character(db, character_id=character_id) is None:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return {"message": "Character deleted"}
 
