@@ -1,6 +1,6 @@
 from fastapi import Request
 
-from utils.i18n import active_translation
+from genstoryai_backend.utils.i18n import active_translation
 
 
 def add_middlewares(app):

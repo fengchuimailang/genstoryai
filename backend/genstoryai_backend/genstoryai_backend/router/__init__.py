@@ -1,0 +1,1 @@
+from genstoryai_backend.router.character_router import router as character_router
