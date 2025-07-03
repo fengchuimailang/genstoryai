@@ -9,7 +9,7 @@ class StoryBase(CommonBase, SQLModel):
     genre: str = Field(description="The genre of the story", default="")
     summary: str = Field(description="The summary of the story", default="")
     version: int = Field(default=1, description="版本号")
-    story_content_ids: List[int] = Field(description="关联的故事内容 ID 列表", default=[])
+    content_generation_ids: List[int] = Field(description="关联的内容生成记录 ID 列表", default=[])
 
 class Story(StoryBase, table=True):
     id: int = Field(primary_key=True, index=True)
@@ -26,4 +26,4 @@ class StoryUpdate(CommonBase, SQLModel):
     genre: Optional[str] = None
     summary: Optional[str] = None
     version: int = Field(default=1, description="版本号")
-    story_content_ids: Optional[List[int]] = None
+    content_generation_ids: Optional[List[int]] = None
