@@ -1,8 +1,9 @@
 from typing import Optional
 from sqlmodel import SQLModel, Field
+from . import CommonBase
 
 
-class CharacterBase(SQLModel):
+class CharacterBase(CommonBase, SQLModel):
     name: str = Field(description="The name of the character")
     description: str = Field(description="The description of the character", default="")
     age: int = Field(description="The age of the character", default=0)
@@ -20,7 +21,7 @@ class CharacterCreate(CharacterBase):
 class CharacterRead(CharacterBase):
     id: int
 
-class CharacterUpdate(SQLModel):
+class CharacterUpdate(CommonBase, SQLModel):
     name: Optional[str] = None
     description: Optional[str] = None
     age: Optional[int] = None
