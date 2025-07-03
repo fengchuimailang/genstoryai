@@ -10,14 +10,14 @@ SSF StorySchema Format is a file protocol which contains following part:
 tips
 - 对content_blocks中的文本使用 LZ4 或 Zstandard 压缩，压缩比可达 1:5~1:10
 """
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 class _Metadata(BaseModel):
-    title: str = pydantic.Field(description="The title of the story")
-    author: str = pydantic.Field(description="The author of the story", default="")
-    genre: str = pydantic.Field(description="The genre of the story", default="")
-    summary: str = pydantic.Field(description="The summary of the story", default="")
-    version: int = pydantic.Field(default=1, description="版本号")
+    title: str = Field(description="The title of the story")
+    author: str = Field(description="The author of the story", default="")
+    genre: str = Field(description="The genre of the story", default="")
+    summary: str = Field(description="The summary of the story", default="")
+    version: int = Field(default=1, description="版本号")
 
 class _ContentBlocks(BaseModel):
     pass
