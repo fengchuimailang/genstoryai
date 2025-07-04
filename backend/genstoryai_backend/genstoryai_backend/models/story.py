@@ -1,18 +1,8 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field
-from enum import Enum
 from . import CommonBase
-
-class Genre(str, Enum):
-    FANTASY = "fantasy"  # 奇幻
-    SCIENCE_FICTION = "science_fiction"  # 科幻
-    MYSTERY = "mystery"  # 悬疑
-    ROMANCE = "romance"  # 浪漫爱情
-    THRILLER = "thriller"  # 惊悚
-    HORROR = "horror"  # 恐怖
-    ADVENTURE = "adventure"  # 冒险
-    HISTORICAL = "historical"  # 历史
-    CONTEMPORARY = "contemporary"  # 现代
+from ..ssf.ssf import StorySchemaFormat
+from .genre import Genre
 
 
 class StoryBase(CommonBase, SQLModel):
@@ -24,6 +14,25 @@ class StoryBase(CommonBase, SQLModel):
     summary: str = Field(description="The summary of the story", default="")
     version: int = Field(default=1, description="版本号")
     story_template_id: Optional[int] = Field(description="关联的故事模板 ID")
+    ssf: Optional[str] = Field(default=None, description="SSF 格式的故事")
+
+    @property
+    def ssf_obj(self) -> Optional[StorySchemaFormat]:
+        if self.ssf:
+            try:
+                return StorySchemaFormat.from_json(self.ssf)
+            except ValueError as e:
+                # 处理无效 JSON 的情况，例如记录日志或返回 None
+                print(f"Error parsing SSF JSON: {e}")
+                return None
+        return None
+
+    @ssf_obj.setter
+    def ssf_obj(self, value: Optional[StorySchemaFormat]):
+        if value:
+            self.ssf = value.to_json()
+        else:
+            self.ssf = None
 
 class Story(StoryBase, table=True):
     id: int = Field(primary_key=True, index=True)

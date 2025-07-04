@@ -11,16 +11,19 @@ tips
 - 对content_blocks中的文本使用 LZ4 或 Zstandard 压缩，压缩比可达 1:5~1:10
 """
 from pydantic import BaseModel,Field
+from typing import List
+
+from ..models.genre import Genre
 
 class _Metadata(BaseModel):
     title: str = Field(description="The title of the story")
     author: str = Field(description="The author of the story", default="")
-    genre: str = Field(description="The genre of the story", default="")
+    genre: Genre = Field(description="The genre of the story", default=Genre.FANTASY)
     summary: str = Field(description="The summary of the story", default="")
     version: int = Field(default=1, description="版本号")
 
 class _ContentBlocks(BaseModel):
-    pass
+    blocks: List[str] = Field(default_factory=list, description="List of content blocks")
 
 class _Characters(BaseModel):
     pass
@@ -38,8 +41,9 @@ class StorySchemaFormat(BaseModel):
     timeline: _Timeline
     extended_metadata: _ExtendedMetadata
 
-    def to_json(self):
+    def to_json(self) -> str:
         return self.model_dump_json()
 
-    def from_json(cls, json_str: str):
+    @classmethod
+    def from_json(cls, json_str: str) -> 'StorySchemaFormat':
         return cls.model_validate_json(json_str)

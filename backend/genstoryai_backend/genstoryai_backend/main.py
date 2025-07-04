@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
+
 from genstoryai_backend.utils.i18n import compile_translations
 from contextlib import asynccontextmanager
 compile_translations()
@@ -7,6 +8,7 @@ compile_translations()
 from genstoryai_backend.utils.middleware import add_middlewares
 from genstoryai_backend.utils.i18n import trans 
 from genstoryai_backend.database.db import create_db_and_tables
+from genstoryai_backend.router import story_router
 from genstoryai_backend.router import character_router
 
 @asynccontextmanager
@@ -19,6 +21,7 @@ add_middlewares(app)
 
 # add router
 app.include_router(character_router)
+app.include_router(story_router)
 
 @app.get("/")
 async def root():
