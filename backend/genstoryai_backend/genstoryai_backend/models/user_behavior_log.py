@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 from . import CommonBase
 
 class UserBehaviorLogBase(CommonBase, BaseModel):
