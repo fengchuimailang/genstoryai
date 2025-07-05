@@ -1,12 +1,17 @@
-from sqlmodel import BaseModel
+from sqlmodel import SQLModel
+from typing import Optional
+from sqlmodel import Field
 
-class UserBase(BaseModel):
-    username: str
-    email: str
+class UserBase(SQLModel, table=False):
+    username: str = Field(default="")
+    email: str = Field(default="")
 
-class User(UserBase):
-    id: int
-    is_active: bool
+class User(UserBase, table=True):
+    id: int = Field(default=None, primary_key=True)
+    is_active: bool = Field(default=True)
+    password: str = Field(default="")
+    is_verified: bool = Field(default=False)
+    verification_token: Optional[str] = Field(default=None)
 
 class UserCreate(UserBase):
     password: str
@@ -14,8 +19,11 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     id: int
 
+class UserLogin(SQLModel, table=False):
+    email: str
+    password: str
 
-class UserUpdate(BaseModel):
+class UserUpdate(SQLModel, table=False):
     username: str | None = None
     email: str | None = None
     password: str | None = None
