@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 from typing import List
 
-from ..database.db import get_session
+from ..database.db import get_db
 from ..models.story import Story, StoryCreate, StoryRead, StoryUpdate
+from ..database.crud import create_story, get_story, get_stories, update_story, delete_story
 
 
 story_router = APIRouter(
@@ -13,49 +14,27 @@ story_router = APIRouter(
 )
 
 @story_router.post("/stories/", response_model=StoryCreate)
-def create_story(story: StoryCreate, db: Session = Depends(get_session)):
+def create_story_endpoint(story: StoryCreate, db: Session = Depends(get_db)):
     """创建新故事"""
-    db_story = Story(**story.dict())
-    db.add(db_story)
-    db.commit()
-    db.refresh(db_story)
-    return db_story
+    return create_story(db, story)
 
 @story_router.get("/stories/", response_model=List[StoryRead])
-def get_stories(skip: int = 0, limit: int = 100, db: Session = Depends(get_session)):
+def get_stories_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """获取故事列表"""
-    stories = db.query(Story).offset(skip).limit(limit).all()
-    return stories
+    return get_stories(db, skip=skip, limit=limit)
 
 @story_router.get("/stories/{story_id}", response_model=StoryRead)
-def get_story(story_id: int, db: Session = Depends(get_session)):
+def get_story_endpoint(story_id: int, db: Session = Depends(get_db)):
     """获取单个故事详情"""
-    story = db.query(Story).filter(Story.id == story_id).first()
-    if story is None:
-        raise HTTPException(status_code=404, detail="Story not found")
-    return story
+    return get_story(db, story_id)
 
 @story_router.put("/stories/{story_id}", response_model=StoryRead)
-def update_story(story_id: int, story: StoryUpdate, db: Session = Depends(get_session)):
+def update_story_endpoint(story_id: int, story: StoryUpdate, db: Session = Depends(get_db)):
     """更新故事信息"""
-    db_story = db.query(Story).filter(Story.id == story_id).first()
-    if db_story is None:
-        raise HTTPException(status_code=404, detail="Story not found")
-    
-    for key, value in story.dict(exclude_unset=True).items():
-        setattr(db_story, key, value)
-    
-    db.commit()
-    db.refresh(db_story)
-    return db_story
+    return update_story(db, story_id, story)
 
 @story_router.delete("/stories/{story_id}")
-def delete_story(story_id: int, db: Session = Depends(get_session)):
+def delete_story_endpoint(story_id: int, db: Session = Depends(get_db)):
     """删除故事"""
-    db_story = db.query(Story).filter(Story.id == story_id).first()
-    if db_story is None:
-        raise HTTPException(status_code=404, detail="Story not found")
-    
-    db.delete(db_story)
-    db.commit()
+    delete_story(db, story_id)
     return {"message": "Story deleted successfully"}

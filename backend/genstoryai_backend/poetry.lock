@@ -14,14 +14,14 @@ files = [
 
 [[package]]
 name = "anthropic"
-version = "0.56.0"
+version = "0.57.1"
 description = "The official Python library for the anthropic API"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "anthropic-0.56.0-py3-none-any.whl", hash = "sha256:91f1f74abdcf0958d3296b657304588cc244b1107b89f973ff6f511afdacfc56"},
-    {file = "anthropic-0.56.0.tar.gz", hash = "sha256:56fa9eb61afa004a1664bc85eed071e77b96c579b77395e9cc893097e599f72e"},
+    {file = "anthropic-0.57.1-py3-none-any.whl", hash = "sha256:33afc1f395af207d07ff1bffc0a3d1caac53c371793792569c5d2f09283ea306"},
+    {file = "anthropic-0.57.1.tar.gz", hash = "sha256:7815dd92245a70d21f65f356f33fc80c5072eada87fb49437767ea2918b2c4b0"},
 ]
 
 [package.dependencies]
@@ -108,19 +108,84 @@ files = [
 ]
 
 [[package]]
+name = "bcrypt"
+version = "4.3.0"
+description = "Modern password hashing for your software and your servers"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "bcrypt-4.3.0-cp313-cp313t-macosx_10_12_universal2.whl", hash = "sha256:f01e060f14b6b57bbb72fc5b4a83ac21c443c9a2ee708e04a10e9192f90a6281"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c5eeac541cefd0bb887a371ef73c62c3cd78535e4887b310626036a7c0a817bb"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:59e1aa0e2cd871b08ca146ed08445038f42ff75968c7ae50d2fdd7860ade2180"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_28_aarch64.whl", hash = "sha256:0042b2e342e9ae3d2ed22727c1262f76cc4f345683b5c1715f0250cf4277294f"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:74a8d21a09f5e025a9a23e7c0fd2c7fe8e7503e4d356c0a2c1486ba010619f09"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_28_x86_64.whl", hash = "sha256:0142b2cb84a009f8452c8c5a33ace5e3dfec4159e7735f5afe9a4d50a8ea722d"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_34_aarch64.whl", hash = "sha256:12fa6ce40cde3f0b899729dbd7d5e8811cb892d31b6f7d0334a1f37748b789fd"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-manylinux_2_34_x86_64.whl", hash = "sha256:5bd3cca1f2aa5dbcf39e2aa13dd094ea181f48959e1071265de49cc2b82525af"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-musllinux_1_1_aarch64.whl", hash = "sha256:335a420cfd63fc5bc27308e929bee231c15c85cc4c496610ffb17923abf7f231"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-musllinux_1_1_x86_64.whl", hash = "sha256:0e30e5e67aed0187a1764911af023043b4542e70a7461ad20e837e94d23e1d6c"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:3b8d62290ebefd49ee0b3ce7500f5dbdcf13b81402c05f6dafab9a1e1b27212f"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:2ef6630e0ec01376f59a006dc72918b1bf436c3b571b80fa1968d775fa02fe7d"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-win32.whl", hash = "sha256:7a4be4cbf241afee43f1c3969b9103a41b40bcb3a3f467ab19f891d9bc4642e4"},
+    {file = "bcrypt-4.3.0-cp313-cp313t-win_amd64.whl", hash = "sha256:5c1949bf259a388863ced887c7861da1df681cb2388645766c89fdfd9004c669"},
+    {file = "bcrypt-4.3.0-cp38-abi3-macosx_10_12_universal2.whl", hash = "sha256:f81b0ed2639568bf14749112298f9e4e2b28853dab50a8b357e31798686a036d"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:864f8f19adbe13b7de11ba15d85d4a428c7e2f344bac110f667676a0ff84924b"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3e36506d001e93bffe59754397572f21bb5dc7c83f54454c990c74a468cd589e"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:842d08d75d9fe9fb94b18b071090220697f9f184d4547179b60734846461ed59"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:7c03296b85cb87db865d91da79bf63d5609284fc0cab9472fdd8367bbd830753"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:62f26585e8b219cdc909b6a0069efc5e4267e25d4a3770a364ac58024f62a761"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:beeefe437218a65322fbd0069eb437e7c98137e08f22c4660ac2dc795c31f8bb"},
+    {file = "bcrypt-4.3.0-cp38-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:97eea7408db3a5bcce4a55d13245ab3fa566e23b4c67cd227062bb49e26c585d"},
+    {file = "bcrypt-4.3.0-cp38-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:191354ebfe305e84f344c5964c7cd5f924a3bfc5d405c75ad07f232b6dffb49f"},
+    {file = "bcrypt-4.3.0-cp38-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:41261d64150858eeb5ff43c753c4b216991e0ae16614a308a15d909503617732"},
+    {file = "bcrypt-4.3.0-cp38-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:33752b1ba962ee793fa2b6321404bf20011fe45b9afd2a842139de3011898fef"},
+    {file = "bcrypt-4.3.0-cp38-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:50e6e80a4bfd23a25f5c05b90167c19030cf9f87930f7cb2eacb99f45d1c3304"},
+    {file = "bcrypt-4.3.0-cp38-abi3-win32.whl", hash = "sha256:67a561c4d9fb9465ec866177e7aebcad08fe23aaf6fbd692a6fab69088abfc51"},
+    {file = "bcrypt-4.3.0-cp38-abi3-win_amd64.whl", hash = "sha256:584027857bc2843772114717a7490a37f68da563b3620f78a849bcb54dc11e62"},
+    {file = "bcrypt-4.3.0-cp39-abi3-macosx_10_12_universal2.whl", hash = "sha256:0d3efb1157edebfd9128e4e46e2ac1a64e0c1fe46fb023158a407c7892b0f8c3"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:08bacc884fd302b611226c01014eca277d48f0a05187666bca23aac0dad6fe24"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f6746e6fec103fcd509b96bacdfdaa2fbde9a553245dbada284435173a6f1aef"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:afe327968aaf13fc143a56a3360cb27d4ad0345e34da12c7290f1b00b8fe9a8b"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:d9af79d322e735b1fc33404b5765108ae0ff232d4b54666d46730f8ac1a43676"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:f1e3ffa1365e8702dc48c8b360fef8d7afeca482809c5e45e653af82ccd088c1"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:3004df1b323d10021fda07a813fd33e0fd57bef0e9a480bb143877f6cba996fe"},
+    {file = "bcrypt-4.3.0-cp39-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:531457e5c839d8caea9b589a1bcfe3756b0547d7814e9ce3d437f17da75c32b0"},
+    {file = "bcrypt-4.3.0-cp39-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:17a854d9a7a476a89dcef6c8bd119ad23e0f82557afbd2c442777a16408e614f"},
+    {file = "bcrypt-4.3.0-cp39-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:6fb1fd3ab08c0cbc6826a2e0447610c6f09e983a281b919ed721ad32236b8b23"},
+    {file = "bcrypt-4.3.0-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:e965a9c1e9a393b8005031ff52583cedc15b7884fce7deb8b0346388837d6cfe"},
+    {file = "bcrypt-4.3.0-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:79e70b8342a33b52b55d93b3a59223a844962bef479f6a0ea318ebbcadf71505"},
+    {file = "bcrypt-4.3.0-cp39-abi3-win32.whl", hash = "sha256:b4d4e57f0a63fd0b358eb765063ff661328f69a04494427265950c71b992a39a"},
+    {file = "bcrypt-4.3.0-cp39-abi3-win_amd64.whl", hash = "sha256:e53e074b120f2877a35cc6c736b8eb161377caae8925c17688bd46ba56daaa5b"},
+    {file = "bcrypt-4.3.0-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:c950d682f0952bafcceaf709761da0a32a942272fad381081b51096ffa46cea1"},
+    {file = "bcrypt-4.3.0-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:107d53b5c67e0bbc3f03ebf5b030e0403d24dda980f8e244795335ba7b4a027d"},
+    {file = "bcrypt-4.3.0-pp310-pypy310_pp73-manylinux_2_34_aarch64.whl", hash = "sha256:b693dbb82b3c27a1604a3dff5bfc5418a7e6a781bb795288141e5f80cf3a3492"},
+    {file = "bcrypt-4.3.0-pp310-pypy310_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:b6354d3760fcd31994a14c89659dee887f1351a06e5dac3c1142307172a79f90"},
+    {file = "bcrypt-4.3.0-pp311-pypy311_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:a839320bf27d474e52ef8cb16449bb2ce0ba03ca9f44daba6d93fa1d8828e48a"},
+    {file = "bcrypt-4.3.0-pp311-pypy311_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:bdc6a24e754a555d7316fa4774e64c6c3997d27ed2d1964d55920c7c227bc4ce"},
+    {file = "bcrypt-4.3.0-pp311-pypy311_pp73-manylinux_2_34_aarch64.whl", hash = "sha256:55a935b8e9a1d2def0626c4269db3fcd26728cbff1e84f0341465c31c4ee56d8"},
+    {file = "bcrypt-4.3.0-pp311-pypy311_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:57967b7a28d855313a963aaea51bf6df89f833db4320da458e5b3c5ab6d4c938"},
+    {file = "bcrypt-4.3.0.tar.gz", hash = "sha256:3a3fd2204178b6d2adcf09cb4f6426ffef54762577a7c9b54c159008cb288c18"},
+]
+
+[package.extras]
+tests = ["pytest (>=3.2.1,!=3.3.0)"]
+typecheck = ["mypy"]
+
+[[package]]
 name = "boto3"
-version = "1.39.1"
+version = "1.39.3"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.39.1-py3-none-any.whl", hash = "sha256:beb945ec1ab4bb48d39640ce7d3054b7e4ab2020ef3259034c039195ae04b2f7"},
-    {file = "boto3-1.39.1.tar.gz", hash = "sha256:3f89d6f05ab7d3a6f6807b45e9456a1a0db53bb47b1758cf5e0a3479cdd6d734"},
+    {file = "boto3-1.39.3-py3-none-any.whl", hash = "sha256:056cfa2440fe1a157a7c2be897c749c83e1a322144aa4dad889f2fca66571019"},
+    {file = "boto3-1.39.3.tar.gz", hash = "sha256:0a367106497649ae3d8a7b571b8c3be01b7b935a0fe303d4cc2574ed03aecbb4"},
 ]
 
 [package.dependencies]
-botocore = ">=1.39.1,<1.40.0"
+botocore = ">=1.39.3,<1.40.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.13.0,<0.14.0"
 
@@ -129,14 +194,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.39.1"
+version = "1.39.3"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.39.1-py3-none-any.whl", hash = "sha256:912d518ac3096460e54d2cf80899943a521a586fd5c075568e807f3c35623318"},
-    {file = "botocore-1.39.1.tar.gz", hash = "sha256:ac829b46b30bd837392c9792cdf63b44d290a4691c028b5e66ab471ced1b8305"},
+    {file = "botocore-1.39.3-py3-none-any.whl", hash = "sha256:66a81cfac18ad5e9f47696c73fdf44cdbd8f8ca51ab3fca1effca0aabf61f02f"},
+    {file = "botocore-1.39.3.tar.gz", hash = "sha256:da8f477e119f9f8a3aaa8b3c99d9c6856ed0a243680aa3a3fbbfc15a8d4093fb"},
 ]
 
 [package.dependencies]
@@ -337,6 +402,25 @@ files = [
 ]
 
 [[package]]
+name = "ecdsa"
+version = "0.19.1"
+description = "ECDSA cryptographic signature library (pure python)"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.6"
+groups = ["main"]
+files = [
+    {file = "ecdsa-0.19.1-py2.py3-none-any.whl", hash = "sha256:30638e27cf77b7e15c4c4cc1973720149e1033827cfd00661ca5c8cc0cdb24c3"},
+    {file = "ecdsa-0.19.1.tar.gz", hash = "sha256:478cba7b62555866fcb3bb3fe985e06decbdb68ef55713c4e5ab98c57d508e61"},
+]
+
+[package.dependencies]
+six = ">=1.9.0"
+
+[package.extras]
+gmpy = ["gmpy"]
+gmpy2 = ["gmpy2"]
+
+[[package]]
 name = "eval-type-backport"
 version = "0.2.2"
 description = "Like `typing._eval_type`, but lets older Python versions use newer typing features."
@@ -353,14 +437,14 @@ tests = ["pytest"]
 
 [[package]]
 name = "fasta2a"
-version = "0.3.5"
+version = "0.3.6"
 description = "Convert an AI Agent into a A2A server! ✨"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "fasta2a-0.3.5-py3-none-any.whl", hash = "sha256:19df09498da5f0e199403a70852e5e0980ce481fe11370cb45abdd52026a2113"},
-    {file = "fasta2a-0.3.5.tar.gz", hash = "sha256:a415890c41063dadcd3f839316dcaca9e34c7fe6301493350db99a1d52c43e5b"},
+    {file = "fasta2a-0.3.6-py3-none-any.whl", hash = "sha256:d018c65a58120f55741ef77218de76734cf3eff5b9f296f4bc5a6365dc88f792"},
+    {file = "fasta2a-0.3.6.tar.gz", hash = "sha256:f02d27c350603f3790add9e2cc4d8c685051827915a9e3afd31851c203ea1803"},
 ]
 
 [package.dependencies]
@@ -857,15 +941,15 @@ files = [
 
 [[package]]
 name = "huggingface-hub"
-version = "0.33.1"
+version = "0.33.2"
 description = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
 optional = false
 python-versions = ">=3.8.0"
 groups = ["main"]
 markers = "platform_system != \"Emscripten\""
 files = [
-    {file = "huggingface_hub-0.33.1-py3-none-any.whl", hash = "sha256:ec8d7444628210c0ba27e968e3c4c973032d44dcea59ca0d78ef3f612196f095"},
-    {file = "huggingface_hub-0.33.1.tar.gz", hash = "sha256:589b634f979da3ea4b8bdb3d79f97f547840dc83715918daf0b64209c0844c7b"},
+    {file = "huggingface_hub-0.33.2-py3-none-any.whl", hash = "sha256:3749498bfa91e8cde2ddc2c1db92c79981f40e66434c20133b39e5928ac9bcc5"},
+    {file = "huggingface_hub-0.33.2.tar.gz", hash = "sha256:84221defaec8fa09c090390cd68c78b88e3c4c2b7befba68d3dc5aacbc3c2c5f"},
 ]
 
 [package.dependencies]
@@ -1084,14 +1168,14 @@ referencing = ">=0.31.0"
 
 [[package]]
 name = "langfuse"
-version = "3.0.9"
+version = "3.1.2"
 description = "A client library for accessing langfuse"
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "langfuse-3.0.9-py3-none-any.whl", hash = "sha256:ed79bcf060577c6fa2f3c3854c59ca46268d0127dd8e5c5fb48feb574cb42181"},
-    {file = "langfuse-3.0.9.tar.gz", hash = "sha256:db0423868f6295f5eaf729b1b86f3d82837b9582c7718a820d413014002308ca"},
+    {file = "langfuse-3.1.2-py3-none-any.whl", hash = "sha256:cbfaa16834753a22abc9393c745d221eeaa4c2f008f9bf2089a999b8bbce4a8e"},
+    {file = "langfuse-3.1.2.tar.gz", hash = "sha256:1caaf02ce51ab327ba8cc39ca42f719924849d5f0127b2801705c6993953ff41"},
 ]
 
 [package.dependencies]
@@ -1111,14 +1195,14 @@ openai = ["openai (>=0.27.8)"]
 
 [[package]]
 name = "logfire-api"
-version = "3.21.2"
+version = "3.22.0"
 description = "Shim for the Logfire SDK which does nothing unless Logfire is installed"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "logfire_api-3.21.2-py3-none-any.whl", hash = "sha256:14ae7689be6ad51ce68f2009bade1e4c804f01e17e435ab9ecb11c799ff027a2"},
-    {file = "logfire_api-3.21.2.tar.gz", hash = "sha256:3edb299775d52cdb1b894794bc6bda6aaccf73a70c0707f6aa623040aabf0161"},
+    {file = "logfire_api-3.22.0-py3-none-any.whl", hash = "sha256:724f98463845fe893f1b7cbda486b4088593adc31ffb0c7076688d13f2d284ab"},
+    {file = "logfire_api-3.22.0.tar.gz", hash = "sha256:30a1bc8b67b6feaeef59f7ee01270f06748d26d0e797c3cadcd0e68455c650b5"},
 ]
 
 [[package]]
@@ -1421,6 +1505,24 @@ files = [
 ]
 
 [[package]]
+name = "passlib"
+version = "1.7.4"
+description = "comprehensive password hashing framework supporting over 30 schemes"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1"},
+    {file = "passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04"},
+]
+
+[package.extras]
+argon2 = ["argon2-cffi (>=18.2.0)"]
+bcrypt = ["bcrypt (>=3.1.0)"]
+build-docs = ["cloud-sptheme (>=1.10.1)", "sphinx (>=1.6)", "sphinxcontrib-fulltoc (>=1.2.0)"]
+totp = ["cryptography"]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 description = "plugin and hook calling mechanisms for python"
@@ -1535,33 +1637,33 @@ timezone = ["tzdata ; python_version >= \"3.9\" and platform_system == \"Windows
 
 [[package]]
 name = "pydantic-ai"
-version = "0.3.5"
+version = "0.3.6"
 description = "Agent Framework / shim to use Pydantic with LLMs"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic_ai-0.3.5-py3-none-any.whl", hash = "sha256:f78c3f3a9a312880b1872192e22bc5439321623d5fedd4e97ac3d3cc2ae29236"},
-    {file = "pydantic_ai-0.3.5.tar.gz", hash = "sha256:594902ec28e99ed0ee96fe1f1800448ec6149618b4a51bd9ac0671353cd8d0a4"},
+    {file = "pydantic_ai-0.3.6-py3-none-any.whl", hash = "sha256:d9c10f7ed74076ffe9c61e61db91c5fbebb106360e4cc2372ce24e05d82e2ad8"},
+    {file = "pydantic_ai-0.3.6.tar.gz", hash = "sha256:7ebd314631c83d8c8fe44e14eb50b0b37112b20079a566dfdf929dd09db658cf"},
 ]
 
 [package.dependencies]
-pydantic-ai-slim = {version = "0.3.5", extras = ["a2a", "anthropic", "bedrock", "cli", "cohere", "evals", "google", "groq", "mcp", "mistral", "openai", "vertexai"]}
+pydantic-ai-slim = {version = "0.3.6", extras = ["a2a", "anthropic", "bedrock", "cli", "cohere", "evals", "google", "groq", "mcp", "mistral", "openai", "vertexai"]}
 
 [package.extras]
-examples = ["pydantic-ai-examples (==0.3.5)"]
+examples = ["pydantic-ai-examples (==0.3.6)"]
 logfire = ["logfire (>=3.11.0)"]
 
 [[package]]
 name = "pydantic-ai-slim"
-version = "0.3.5"
+version = "0.3.6"
 description = "Agent Framework / shim to use Pydantic with LLMs, slim package"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic_ai_slim-0.3.5-py3-none-any.whl", hash = "sha256:47a50df55c3f88e5e00e913168765ec8751df57716365c084deb2676a300f54f"},
-    {file = "pydantic_ai_slim-0.3.5.tar.gz", hash = "sha256:b8d25b5712bf912cb595997ece2d5a8ae162f91c2e42297d5c2920d1e3a1e62b"},
+    {file = "pydantic_ai_slim-0.3.6-py3-none-any.whl", hash = "sha256:8eea714cab83f9a6f0884f6c409549811f6745c9e6c008d3cb8186a78464a7ce"},
+    {file = "pydantic_ai_slim-0.3.6.tar.gz", hash = "sha256:b7605ea6c5bdcf6b5f4eb45f2ff05aee339c00023a80251c89db06ba50d0ca46"},
 ]
 
 [package.dependencies]
@@ -1570,7 +1672,7 @@ argcomplete = {version = ">=3.5.0", optional = true, markers = "extra == \"cli\"
 boto3 = {version = ">=1.37.24", optional = true, markers = "extra == \"bedrock\""}
 cohere = {version = ">=5.13.11", optional = true, markers = "platform_system != \"Emscripten\" and extra == \"cohere\""}
 eval-type-backport = ">=0.2.0"
-fasta2a = {version = "0.3.5", optional = true, markers = "extra == \"a2a\""}
+fasta2a = {version = "0.3.6", optional = true, markers = "extra == \"a2a\""}
 google-auth = {version = ">=2.36.0", optional = true, markers = "extra == \"vertexai\""}
 google-genai = {version = ">=1.15.0", optional = true, markers = "extra == \"google\""}
 griffe = ">=1.3.2"
@@ -1582,20 +1684,20 @@ openai = {version = ">=1.76.0", optional = true, markers = "extra == \"openai\""
 opentelemetry-api = ">=1.28.0"
 prompt-toolkit = {version = ">=3", optional = true, markers = "extra == \"cli\""}
 pydantic = ">=2.10"
-pydantic-evals = {version = "0.3.5", optional = true, markers = "extra == \"evals\""}
-pydantic-graph = "0.3.5"
+pydantic-evals = {version = "0.3.6", optional = true, markers = "extra == \"evals\""}
+pydantic-graph = "0.3.6"
 requests = {version = ">=2.32.2", optional = true, markers = "extra == \"vertexai\""}
 rich = {version = ">=13", optional = true, markers = "extra == \"cli\""}
 typing-inspection = ">=0.4.0"
 
 [package.extras]
-a2a = ["fasta2a (==0.3.5)"]
+a2a = ["fasta2a (==0.3.6)"]
 anthropic = ["anthropic (>=0.52.0)"]
 bedrock = ["boto3 (>=1.37.24)"]
 cli = ["argcomplete (>=3.5.0)", "prompt-toolkit (>=3)", "rich (>=13)"]
 cohere = ["cohere (>=5.13.11) ; platform_system != \"Emscripten\""]
 duckduckgo = ["duckduckgo-search (>=7.0.0)"]
-evals = ["pydantic-evals (==0.3.5)"]
+evals = ["pydantic-evals (==0.3.6)"]
 google = ["google-genai (>=1.15.0)"]
 groq = ["groq (>=0.19.0)"]
 logfire = ["logfire (>=3.11.0)"]
@@ -1719,21 +1821,21 @@ typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
 name = "pydantic-evals"
-version = "0.3.5"
+version = "0.3.6"
 description = "Framework for evaluating stochastic code execution, especially code making use of LLMs"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic_evals-0.3.5-py3-none-any.whl", hash = "sha256:1fb9e4a243822cd2d366d776fe7af6b1fb5763a70a70cc213e22df371ed51546"},
-    {file = "pydantic_evals-0.3.5.tar.gz", hash = "sha256:a0cc2d177900ecab5231f45071cad9e7bb442c62bdba49622d0347fddb438ae3"},
+    {file = "pydantic_evals-0.3.6-py3-none-any.whl", hash = "sha256:1ba9d2c3790f6c28f64955c33a4750e54e205dd2a8bae9d77aeb343064b79b74"},
+    {file = "pydantic_evals-0.3.6.tar.gz", hash = "sha256:3ea26d89763533b3d06661543b4eea916ff859451d5c1107ad981a23633c1c49"},
 ]
 
 [package.dependencies]
 anyio = ">=0"
 logfire-api = ">=1.2.0"
 pydantic = ">=2.10"
-pydantic-ai-slim = "0.3.5"
+pydantic-ai-slim = "0.3.6"
 pyyaml = ">=6.0.2"
 rich = ">=13.9.4"
 
@@ -1742,14 +1844,14 @@ logfire = ["logfire (>=2.3)"]
 
 [[package]]
 name = "pydantic-graph"
-version = "0.3.5"
+version = "0.3.6"
 description = "Graph and state machine library"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic_graph-0.3.5-py3-none-any.whl", hash = "sha256:73ca540fca8b7e0bfd02bbbe51464f9a05424cd0b67c02f8cef7858d5a71ae6c"},
-    {file = "pydantic_graph-0.3.5.tar.gz", hash = "sha256:3790b94c8323d38f54ce837e6147c213721444e6374e1f0e43d25a749889dc99"},
+    {file = "pydantic_graph-0.3.6-py3-none-any.whl", hash = "sha256:d3b426d6dcce574fa6a074031314bf87db4627ffac2462dd917a5f72c0677e25"},
+    {file = "pydantic_graph-0.3.6.tar.gz", hash = "sha256:aafc6b4f3a38e8722fd6bf323b1aa5d4754fcb7b52f0e1007187e4115ce213e7"},
 ]
 
 [package.dependencies]
@@ -1860,6 +1962,29 @@ files = [
 
 [package.extras]
 cli = ["click (>=5.0)"]
+
+[[package]]
+name = "python-jose"
+version = "3.5.0"
+description = "JOSE implementation in Python"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "python_jose-3.5.0-py2.py3-none-any.whl", hash = "sha256:abd1202f23d34dfad2c3d28cb8617b90acf34132c7afd60abd0b0b7d3cb55771"},
+    {file = "python_jose-3.5.0.tar.gz", hash = "sha256:fb4eaa44dbeb1c26dcc69e4bd7ec54a1cb8dd64d3b4d81ef08d90ff453f2b01b"},
+]
+
+[package.dependencies]
+ecdsa = "!=0.15"
+pyasn1 = ">=0.5.0"
+rsa = ">=4.0,<4.1.1 || >4.1.1,<4.4 || >4.4,<5.0"
+
+[package.extras]
+cryptography = ["cryptography (>=3.4.0)"]
+pycrypto = ["pycrypto (>=2.6.0,<2.7.0)"]
+pycryptodome = ["pycryptodome (>=3.3.1,<4.0.0)"]
+test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "python-multipart"
@@ -2446,14 +2571,14 @@ urllib3 = ">=2"
 
 [[package]]
 name = "typing-extensions"
-version = "4.14.0"
+version = "4.14.1"
 description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af"},
-    {file = "typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4"},
+    {file = "typing_extensions-4.14.1-py3-none-any.whl", hash = "sha256:d1e1e3b58374dc93031d6eda2420a48ea44a36c2b4766a4fdeb3710755731d76"},
+    {file = "typing_extensions-4.14.1.tar.gz", hash = "sha256:38b39f4aeeab64884ce9f74c94263ef78f3c22467c8724005483154c26648d36"},
 ]
 
 [[package]]
@@ -2711,4 +2836,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "b1d0a0193bbc1ffeb985c9544243ed6dbc0813369e15a43a8a9e4959ab3707cc"
+content-hash = "b9402ddd431ba5801c0949db5e32bee48122197d5dc263ab75db9292010b07e0"

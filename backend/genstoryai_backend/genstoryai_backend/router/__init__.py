@@ -1,2 +1,3 @@
 from genstoryai_backend.router.character_router import character_router
 from genstoryai_backend.router.story_router import story_router
+from genstoryai_backend.router.user_router import user_router

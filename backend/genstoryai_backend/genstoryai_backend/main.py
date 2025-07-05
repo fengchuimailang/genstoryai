@@ -10,6 +10,7 @@ from genstoryai_backend.utils.i18n import trans
 from genstoryai_backend.database.db import create_db_and_tables
 from genstoryai_backend.router import story_router
 from genstoryai_backend.router import character_router
+from genstoryai_backend.router import user_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,6 +23,7 @@ add_middlewares(app)
 # add router
 app.include_router(character_router)
 app.include_router(story_router)
+app.include_router(user_router)
 
 @app.get("/")
 async def root():
