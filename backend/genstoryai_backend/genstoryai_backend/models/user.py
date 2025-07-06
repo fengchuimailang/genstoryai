@@ -1,6 +1,7 @@
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Field
 from typing import Optional
 from sqlmodel import Field
+from datetime import datetime
 
 class UserBase(SQLModel, table=False):
     username: str = Field(default="")
@@ -12,6 +13,7 @@ class User(UserBase, table=True):
     password: str = Field(default="")
     is_verified: bool = Field(default=False)
     verification_token: Optional[str] = Field(default=None)
+    token_created_at: Optional[datetime] = Field(default=None)
 
 class UserCreate(UserBase):
     password: str

@@ -1,0 +1,19 @@
+# Frontend-specific .gitignore (for node, build, lock files, etc.)
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+*.log
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
