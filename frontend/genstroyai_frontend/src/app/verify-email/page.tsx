@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-
-const API_BASE_URL = 'http://localhost:8000';
-
-interface VerificationResponse {
-  message: string;
-  user_id: number;
-  email: string;
-}
+import { Alert } from '../../components/ui/alert';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
+import { debounce, RequestLock } from '../../lib/utils';
+import { verifyEmail, resendVerificationEmail } from '../../api/auth-api';
+import type { VerificationResponse } from '../../api/auth-api';
+import { getErrorMessage } from '../../lib/error-handler';
+import { i18n } from '../../lib/i18n';
 
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
@@ -20,67 +19,98 @@ export default function VerifyEmailPage() {
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // 请求锁实例
+  const requestLockRef = useRef(new RequestLock(10000)); // 10秒超时
+  const isVerifyingRef = useRef(false);
+
+  // 防抖的验证函数
+  const debouncedVerifyEmail = useCallback(
+    debounce(async (token: string) => {
+      if (isVerifyingRef.current) {
+        console.log('验证请求正在进行中，跳过重复请求');
+        return;
+      }
+
+      const lockAcquired = await requestLockRef.current.acquire();
+      if (!lockAcquired) {
+        console.log('请求被锁定，跳过重复请求');
+        return;
+      }
+
+      isVerifyingRef.current = true;
+      setError(null);
+      
+      try {
+        const data: VerificationResponse = await verifyEmail(token);
+        setStatus('success');
+        setMessage(data.message);
+        setEmail(data.email);
+      } catch (error) {
+        setStatus('error');
+        const errorMessage = getErrorMessage(error);
+        setMessage(errorMessage);
+        setError(errorMessage);
+      } finally {
+        isVerifyingRef.current = false;
+        requestLockRef.current.release();
+      }
+    }, 300), // 300ms 防抖延迟
+    []
+  );
 
   useEffect(() => {
     const token = searchParams.get('token');
     if (token) {
-      verifyEmail(token);
+      debouncedVerifyEmail(token);
     } else {
       setStatus('error');
-      setMessage('无效的验证链接');
+      setMessage(i18n.t('auth.invalidToken'));
+      setError(i18n.t('auth.invalidToken'));
     }
-  }, [searchParams]);
+  }, [searchParams, debouncedVerifyEmail]);
 
-  const verifyEmail = async (token: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/verify-email?token=${token}`, {
-        method: 'GET',
-      });
-
-      if (response.ok) {
-        const data: VerificationResponse = await response.json();
-        setStatus('success');
-        setMessage(data.message);
-        setEmail(data.email);
-      } else {
-        const errorData = await response.json();
-        setStatus('error');
-        setMessage(errorData.detail || '验证失败');
+  // 防抖的重发验证函数
+  const debouncedResendVerification = useCallback(
+    debounce(async (email: string) => {
+      if (isResending) {
+        console.log('重发请求正在进行中，跳过重复请求');
+        return;
       }
-    } catch (error) {
-      setStatus('error');
-      setMessage('网络错误，请稍后重试');
-    }
-  };
+
+      const lockAcquired = await requestLockRef.current.acquire();
+      if (!lockAcquired) {
+        console.log('请求被锁定，跳过重复请求');
+        return;
+      }
+
+      setIsResending(true);
+      setError(null);
+      
+      try {
+        await resendVerificationEmail(email);
+        setStatus('success');
+        setMessage(i18n.t('messages.verificationEmailSent'));
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        setMessage(errorMessage);
+        setError(errorMessage);
+      } finally {
+        setIsResending(false);
+        requestLockRef.current.release();
+      }
+    }, 500), // 500ms 防抖延迟
+    [isResending]
+  );
 
   const resendVerification = async (email: string) => {
-    setIsResending(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/resend-verification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setStatus('success');
-        setMessage('验证邮件已重新发送，请检查您的邮箱');
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.detail || '重新发送失败');
-      }
-    } catch (error) {
-      setMessage('网络错误，请稍后重试');
-    } finally {
-      setIsResending(false);
-    }
+    debouncedResendVerification(email);
   };
 
   const handleResend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
+    if (email.trim() && !isResending && !requestLockRef.current.isRequestLocked()) {
       resendVerification(email);
     }
   };
@@ -91,7 +121,7 @@ export default function VerifyEmailPage() {
         return (
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">正在验证您的邮箱...</p>
+            <p className="text-gray-600">{i18n.t('common.loading')}</p>
           </div>
         );
 
@@ -99,10 +129,10 @@ export default function VerifyEmailPage() {
         return (
           <div className="text-center">
             <div className="text-green-600 text-6xl mb-4">✓</div>
-            <h2 className="text-xl font-semibold text-green-600 mb-2">验证成功！</h2>
+            <h2 className="text-xl font-semibold text-green-600 mb-2">{i18n.t('auth.verificationSuccess')}</h2>
             <p className="text-gray-600 mb-6">{message}</p>
             <Button onClick={() => navigate('/login')} className="w-full">
-              前往登录
+              {i18n.t('auth.login')}
             </Button>
           </div>
         );
@@ -111,17 +141,17 @@ export default function VerifyEmailPage() {
         return (
           <div className="text-center">
             <div className="text-red-600 text-6xl mb-4">✗</div>
-            <h2 className="text-xl font-semibold text-red-600 mb-2">验证失败</h2>
+            <h2 className="text-xl font-semibold text-red-600 mb-2">{i18n.t('auth.verificationFailed')}</h2>
             <p className="text-gray-600 mb-6">{message}</p>
             <Button 
               variant="outline" 
               onClick={() => setStatus('resend')}
               className="w-full mb-2"
             >
-              重新发送验证邮件
+              {i18n.t('auth.resendVerification')}
             </Button>
             <Button onClick={() => navigate('/login')} className="w-full">
-              返回登录
+              {i18n.t('auth.login')}
             </Button>
           </div>
         );
@@ -129,16 +159,16 @@ export default function VerifyEmailPage() {
       case 'resend':
         return (
           <div>
-            <h2 className="text-xl font-semibold mb-4">重新发送验证邮件</h2>
+            <h2 className="text-xl font-semibold mb-4">{i18n.t('auth.resendVerification')}</h2>
             <form onSubmit={handleResend} className="space-y-4">
               <div>
-                <Label htmlFor="email">邮箱地址</Label>
+                <Label htmlFor="email">{i18n.t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="请输入您的邮箱地址"
+                  placeholder={i18n.t('auth.email')}
                   required
                 />
               </div>
@@ -147,7 +177,7 @@ export default function VerifyEmailPage() {
                 className="w-full"
                 disabled={isResending}
               >
-                {isResending ? '发送中...' : '发送验证邮件'}
+                {isResending ? i18n.t('common.loading') : i18n.t('auth.resendVerification')}
               </Button>
               <Button 
                 type="button"
@@ -155,7 +185,7 @@ export default function VerifyEmailPage() {
                 onClick={() => navigate('/login')}
                 className="w-full"
               >
-                返回登录
+                {i18n.t('auth.login')}
               </Button>
             </form>
           </div>
@@ -168,17 +198,28 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+      
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">邮箱验证</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">{i18n.t('auth.emailVerification')}</CardTitle>
           <CardDescription className="text-center">
-            {status === 'loading' && '正在验证您的邮箱地址...'}
-            {status === 'success' && '您的邮箱已成功验证'}
-            {status === 'error' && '验证过程中遇到问题'}
-            {status === 'resend' && '重新发送验证邮件'}
+            {status === 'loading' && i18n.t('common.loading')}
+            {status === 'success' && i18n.t('auth.verificationSuccess')}
+            {status === 'error' && i18n.t('auth.verificationFailed')}
+            {status === 'resend' && i18n.t('auth.resendVerification')}
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert 
+              type="error" 
+              message={error} 
+              className="mb-4"
+            />
+          )}
           {renderContent()}
         </CardContent>
       </Card>

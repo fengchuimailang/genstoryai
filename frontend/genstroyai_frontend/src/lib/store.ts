@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User } from '../api/auth';
+import type { User } from '../api/auth-api';
 
 interface AuthState {
   user: User | null;
@@ -8,6 +8,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  lastLoginTime: number | null;
 }
 
 interface AuthActions {
@@ -17,19 +18,22 @@ interface AuthActions {
   setError: (error: string | null) => void;
   logout: () => void;
   clearError: () => void;
+  updateUser: (updates: Partial<User>) => void;
+  refreshToken: (token: string) => void;
 }
 
 type AuthStore = AuthState & AuthActions;
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       // State
       user: null,
       token: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      lastLoginTime: null,
 
       // Actions
       setUser: (user) =>
@@ -37,6 +41,7 @@ export const useAuthStore = create<AuthStore>()(
           user,
           isAuthenticated: true,
           error: null,
+          lastLoginTime: Date.now(),
         }),
 
       setToken: (token) =>
@@ -61,11 +66,22 @@ export const useAuthStore = create<AuthStore>()(
           token: null,
           isAuthenticated: false,
           error: null,
+          lastLoginTime: null,
         }),
 
       clearError: () =>
         set({
           error: null,
+        }),
+
+      updateUser: (updates) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updates } : null,
+        })),
+
+      refreshToken: (token) =>
+        set({
+          token,
         }),
     }),
     {
@@ -74,7 +90,20 @@ export const useAuthStore = create<AuthStore>()(
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
+        lastLoginTime: state.lastLoginTime,
       }),
+      // 添加版本控制，便于后续迁移
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0) {
+          // 处理旧版本数据迁移
+          return {
+            ...persistedState,
+            lastLoginTime: null,
+          };
+        }
+        return persistedState;
+      },
     }
   )
 ); 
