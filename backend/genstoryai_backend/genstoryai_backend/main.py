@@ -3,6 +3,7 @@ import uvicorn
 
 from genstoryai_backend.utils.i18n import compile_translations
 from contextlib import asynccontextmanager
+from genstoryai_backend.config import print_env_vars
 compile_translations()
 
 from genstoryai_backend.utils.middleware import add_middlewares
@@ -31,4 +32,5 @@ async def root():
 
 
 if __name__ == "__main__":
+    print_env_vars()
     uvicorn.run(app, host="0.0.0.0", port=8000)
