@@ -20,11 +20,11 @@ jobs:
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: ./frontend/genstroyai_frontend
+        working-directory: ./frontend/genstoryai_frontend
 
       - name: Build frontend
         run: pnpm run build
-        working-directory: ./frontend/genstroyai_frontend
+        working-directory: ./frontend/genstoryai_frontend
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -45,7 +45,7 @@ jobs:
 
       - name: Rsync frontend dist to server
         run: |
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./frontend/genstroyai_frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist/
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./frontend/genstoryai_frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist/
 
       - name: Deploy on server (with backup)
         run: |
