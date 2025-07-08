@@ -8,10 +8,6 @@ dist/
 build/
 *.log
 
-# Lock files
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
 
 # Editor/IDE
 .vscode/
