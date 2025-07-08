@@ -25,7 +25,7 @@ WORKDIR /app
 
 # 生产环境也要有运行依赖（如 mysqlclient），所以再装一次
 RUN apt-get update && \
-    apt-get install -y default-libmysqlclient-dev && \
+    apt-get install -y supervisor default-libmysqlclient-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # 复制后端
@@ -44,4 +44,4 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 80
 
 # 启动 supervisor
-CMD ["/usr/bin/supervisord"] 
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
