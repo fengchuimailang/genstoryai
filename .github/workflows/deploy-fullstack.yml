@@ -33,27 +33,24 @@ jobs:
 
       - name: Ensure project path exists
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo mkdir -p ${{ secrets.SERVER_PROJECT_PATH }}/backend ${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist && sudo chown -R ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_USER }} ${{ secrets.SERVER_PROJECT_PATH }}"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo mkdir -p ${{ secrets.SERVER_PROJECT_PATH }} && sudo chown -R ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_USER }} ${{ secrets.SERVER_PROJECT_PATH }}"
 
-      - name: Rsync backend code to server
+      - name: Rsync deploy files to server
         run: |
           rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/backend/
-
-      - name: Rsync docker-compose.yml to server
-        run: |
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
-
-      - name: Rsync frontend dist to server
-        run: |
           rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./frontend/genstoryai_frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist/
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./Dockerfile ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./nginx.conf ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./supervisord.conf ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
 
-      - name: Deploy on server (with backup)
+      - name: Build and deploy on server (with backup)
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            docker compose config > docker-compose.last-success.yaml || true &&
-            docker compose build &&
-            docker compose up -d --remove-orphans
+            docker image tag genstoryai-fullstack:latest genstoryai-fullstack:last-success || true &&
+            docker build -t genstoryai-fullstack:latest . &&
+            docker stop genstoryai-fullstack || true && docker rm genstoryai-fullstack || true &&
+            docker run -d --name genstoryai-fullstack -p 80:80 genstoryai-fullstack:latest
           "
 
       - name: Healthcheck Backend
@@ -70,10 +67,6 @@ jobs:
           echo "Healthcheck failed, rolling back..."
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            if [ -f docker-compose.last-success.yaml ]; then
-              docker compose -f docker-compose.last-success.yaml up -d --remove-orphans
-            else
-              echo 'No backup found, cannot rollback.'
-              exit 1
-            fi
+            docker stop genstoryai-fullstack || true && docker rm genstoryai-fullstack || true &&
+            docker run -d --name genstoryai-fullstack -p 80:80 genstoryai-fullstack:last-success
           " 
