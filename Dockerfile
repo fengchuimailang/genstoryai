@@ -10,7 +10,7 @@ RUN pnpm run build
 FROM python:3.12-slim AS backend-build
 WORKDIR /app
 COPY backend/genstoryai_backend/pyproject.toml backend/genstoryai_backend/poetry.lock ./
-RUN pip install poetry && poetry install --no-root --no-dev
+RUN pip install poetry && poetry install --no-root
 COPY backend/genstoryai_backend .
 
 # 生产镜像
