@@ -1,9 +1,9 @@
 # 构建前端
 FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
-COPY frontend/genstroyai_frontend/package.json frontend/genstroyai_frontend/pnpm-lock.yaml ./
+COPY frontend/genstoryai_frontend/package.json frontend/genstoryai_frontend/pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install --frozen-lockfile
-COPY frontend/genstroyai_frontend .
+COPY frontend/genstoryai_frontend .
 RUN pnpm run build
 
 # 构建后端
