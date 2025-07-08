@@ -35,13 +35,20 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo mkdir -p ${{ secrets.SERVER_PROJECT_PATH }} && sudo chown -R ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_USER }} ${{ secrets.SERVER_PROJECT_PATH }}"
 
-      - name: Rsync deploy files to server
+      - name: Rsync all code to server
         run: |
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/backend/
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./frontend/genstoryai_frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist/
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./Dockerfile ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./nginx.conf ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./supervisord.conf ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
+          rsync -avz --delete \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            --exclude 'frontend/genstoryai_frontend/node_modules' \
+            --exclude 'frontend/genstoryai_frontend/dist' \
+            --exclude '.github' \
+            --exclude '*.db' \
+            --exclude '*.sqlite3' \
+            --exclude 'db_data' \
+            --exclude 'data' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
 
       - name: Build and deploy on server (with backup)
         run: |
