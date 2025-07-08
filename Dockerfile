@@ -8,6 +8,12 @@ RUN pnpm run build
 
 # 构建后端
 FROM python:3.12-slim AS backend-build
+
+# 安装系统依赖（必须在 poetry install 之前！）
+RUN apt-get update && \
+    apt-get install -y gcc default-libmysqlclient-dev pkg-config && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY backend/genstoryai_backend/pyproject.toml backend/genstoryai_backend/poetry.lock ./
 RUN pip install poetry && poetry install --no-root
@@ -17,9 +23,9 @@ COPY backend/genstoryai_backend .
 FROM python:3.12-slim
 WORKDIR /app
 
-# 安装系统依赖
+# 生产环境也要有运行依赖（如 mysqlclient），所以再装一次
 RUN apt-get update && \
-    apt-get install -y gcc default-libmysqlclient-dev pkg-config && \
+    apt-get install -y default-libmysqlclient-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # 复制后端
