@@ -15,7 +15,8 @@ RUN useradd --create-home --shell /bin/bash app
 
 # 复制 Poetry 配置文件并安装依赖
 COPY pyproject.toml poetry.lock ./
-RUN pip install poetry && poetry install --no-root --no-dev
+RUN pip install poetry 
+RUN poetry install --no-root --no-dev
 
 # 复制后端全部代码
 COPY . .
