@@ -41,7 +41,6 @@ jobs:
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude 'frontend/genstoryai_frontend/node_modules' \
-            --exclude 'frontend/genstoryai_frontend/dist' \
             --exclude '.github' \
             --exclude '*.db' \
             --exclude '*.sqlite3' \

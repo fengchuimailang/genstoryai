@@ -1,11 +1,4 @@
-# 构建前端
-FROM node:20-alpine AS frontend-build
-WORKDIR /app/frontend
-COPY frontend/genstoryai_frontend/package.json frontend/genstoryai_frontend/pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
-COPY frontend/genstoryai_frontend .
-RUN pnpm run build
-
+# 基础镜像
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -16,7 +9,6 @@ RUN apt-get update && \
     pip install "poetry==1.7.1" && \
     rm -rf /var/lib/apt/lists/*
 
-# 推荐 in-project venv，方便依赖和代码一起管理
 RUN poetry config virtualenvs.in-project true
 
 # 复制后端依赖文件并安装依赖
@@ -26,7 +18,7 @@ RUN poetry install --no-root
 # 复制后端代码
 COPY backend/genstoryai_backend .
 
-# 复制前端静态文件
+# 复制本地已构建好的前端静态文件
 COPY frontend/genstoryai_frontend/dist /usr/share/nginx/html
 
 # 复制 nginx/supervisor 配置
