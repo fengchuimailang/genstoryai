@@ -6,8 +6,6 @@ WORKDIR /app
 # 复制package文件
 COPY package*.json ./
 
-# 安装依赖
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 # 复制源代码
 COPY . .
@@ -17,7 +15,7 @@ ARG VITE_API_BASE_URL=http://localhost:5000
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # 构建应用
-RUN pnpm run build
+RUN npm run build
 
 # 生产阶段
 FROM nginx:alpine
