@@ -2,16 +2,13 @@ import * as React from "react"
 import {
   BookOpen,
   Plus,
-  FileText,
   Settings,
   HelpCircle,
   Search,
   User,
   LogOut,
   Home,
-  PenTool,
   Library,
-  Star,
   BarChart3,
   MessageSquare,
 } from "lucide-react"
