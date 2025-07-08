@@ -34,5 +34,5 @@ async def root():
 
 if __name__ == "__main__":
     print_env_vars()
-    port = int(os.getenv("PORT", 5000))
+    port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
