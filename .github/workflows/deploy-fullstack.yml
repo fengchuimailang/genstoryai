@@ -33,7 +33,7 @@ jobs:
 
       - name: Ensure project path exists
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ${{ secrets.SERVER_PROJECT_PATH }}/backend ${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo mkdir -p ${{ secrets.SERVER_PROJECT_PATH }}/backend ${{ secrets.SERVER_PROJECT_PATH }}/frontend_dist && sudo chown -R $USER:$USER ${{ secrets.SERVER_PROJECT_PATH }}"
 
       - name: Rsync backend code to server
         run: |
