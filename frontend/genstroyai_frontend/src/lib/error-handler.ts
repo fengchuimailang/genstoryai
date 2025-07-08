@@ -234,7 +234,7 @@ export function validateForm(data: Record<string, any>, rules: Record<string, st
   for (const [field, fieldRules] of Object.entries(rules)) {
     const value = data[field];
     
-    for (const rule of fieldRules) {
+    for (const _ of fieldRules) {
       const error = handleValidationError(field, value);
       if (error) {
         errors[field] = error;

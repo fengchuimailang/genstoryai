@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // 注意：若仍报错找不到模块，需确保已安装 react-router-dom，可运行命令：npm install react-router-dom @types/react-router-dom
 import { useAuthStore } from './lib/store';
-import App from './App';
 import LoginPage from './app/login/page';
 import RegisterPage from './app/register/page';
 import HomePage from './app/home/page';

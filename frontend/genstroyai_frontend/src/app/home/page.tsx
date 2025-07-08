@@ -1,4 +1,3 @@
-import { useAuthStore } from '../../lib/store';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
@@ -10,8 +9,6 @@ import {
   Plus, 
   FileText, 
   Settings, 
-  LogOut,
-  User,
   Calendar,
   Star
 } from 'lucide-react';
@@ -19,13 +16,7 @@ import { GenStorySidebar } from '../../components/genstory-sidebar';
 import { SidebarInset, SidebarProvider } from '../../components/ui/sidebar';
 
 export default function HomePage() {
-  const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   // 模拟数据 - 在实际应用中这些数据应该从API获取
   const stats = [
@@ -102,12 +93,10 @@ export default function HomePage() {
 
   return (
     <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
+      style={{
+        "--sidebar-width": "calc(var(--spacing) * 72)",
+        "--header-height": "calc(var(--spacing) * 12)",
+      } as React.CSSProperties}
     >
       <GenStorySidebar variant="inset" />
       <SidebarInset>
@@ -120,10 +109,10 @@ export default function HomePage() {
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <span className="text-sm text-gray-500">
-                    {new Date().toLocaleDateString('zh-CN', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
+                    {new Date().toLocaleDateString('zh-CN', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
                     })}
                   </span>
                 </div>
@@ -258,4 +247,4 @@ export default function HomePage() {
       </SidebarInset>
     </SidebarProvider>
   );
-} 
+}

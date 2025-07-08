@@ -132,7 +132,6 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-  ...rest
 }: ChartTooltipContentProps) {
   const { config } = useChart()
 
