@@ -23,9 +23,10 @@ COPY backend/genstoryai_backend .
 FROM python:3.12-slim
 WORKDIR /app
 
-# 生产环境也要有运行依赖（如 mysqlclient），所以再装一次
+# 安装运行依赖，包括 supervisor、nginx、poetry、default-libmysqlclient-dev
 RUN apt-get update && \
-    apt-get install -y supervisor default-libmysqlclient-dev && \
+    apt-get install -y supervisor nginx default-libmysqlclient-dev && \
+    pip install "poetry==1.7.1" && \
     rm -rf /var/lib/apt/lists/*
 
 # 复制后端
@@ -42,6 +43,8 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # 暴露端口
 EXPOSE 80
+
+EXPOSE 8000
 
 # 启动 supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
