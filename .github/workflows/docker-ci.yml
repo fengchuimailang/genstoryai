@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./frontend/genstroyai_frontend
+        working-directory: ./frontend/genstoryai_frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -72,8 +72,8 @@ jobs:
       - name: Build frontend image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend/genstroyai_frontend
-          file: ./frontend/genstroyai_frontend/Dockerfile
+          context: ./frontend/genstoryai_frontend
+          file: ./frontend/genstoryai_frontend/Dockerfile
           push: false
           tags: genstoryai-frontend:dev
           build-args: |

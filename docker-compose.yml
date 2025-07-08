@@ -36,6 +36,6 @@ services:
     depends_on:
       - backend
     build:
-      context: ./frontend/genstroyai_frontend
+      context: ./frontend/genstoryai_frontend
       args:
         VITE_API_BASE_URL: http://backend:8000
