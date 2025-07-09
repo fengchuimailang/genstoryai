@@ -4,10 +4,10 @@ from sqlmodel import SQLModel, Field
 from .story import Genre
 
 class StoryTemplateBase(SQLModel):
-    genre: Genre = Field(description="故事类型")
-    title_template: str = Field(description="标题模板")
-    plot_template: str = Field(description="剧情模板")
-    character_template: str = Field(description="角色模板")
+    genre: Genre = Field(description="Story genre")
+    title_template: str = Field(description="Title template")
+    plot_template: str = Field(description="Plot template")
+    character_template: str = Field(description="Character template")
 
 class StoryTemplate(StoryTemplateBase, table=True):
     id: int = Field(primary_key=True, index=True)
