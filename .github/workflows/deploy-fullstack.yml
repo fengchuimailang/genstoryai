@@ -42,8 +42,21 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            sed -i 's|http://localhost:80|http://${{ secrets.SERVER_HOST }}:80|g' docker-compose.yml &&
-            sed -i 's|http://localhost|http://${{ secrets.SERVER_HOST }}|g' docker-compose.yml
+            sed -i 's|^ *- OPENAI_API_KEY=.*|- OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}|' docker-compose.yml &&
+            sed -i 's|^ *- OPENAI_BASE_URL=.*|- OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}|' docker-compose.yml &&
+            sed -i 's|^ *- OPENAI_MODEL=.*|- OPENAI_MODEL=${{ secrets.OPENAI_MODEL }}|' docker-compose.yml &&
+            sed -i 's|^ *- DATABASE_URL=.*|- DATABASE_URL=${{ secrets.DATABASE_URL }}|' docker-compose.yml &&
+            sed -i 's|^ *- SECRET_KEY=.*|- SECRET_KEY=${{ secrets.SECRET_KEY }}|' docker-compose.yml &&
+            sed -i 's|^ *- ALGORITHM=.*|- ALGORITHM=${{ secrets.ALGORITHM }}|' docker-compose.yml &&
+            sed -i 's|^ *- ACCESS_TOKEN_EXPIRE_MINUTES=.*|- ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_SERVER=.*|- SMTP_SERVER=${{ secrets.SMTP_SERVER }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_PORT=.*|- SMTP_PORT=${{ secrets.SMTP_PORT }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_USERNAME=.*|- SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_PASSWORD=.*|- SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}|' docker-compose.yml &&
+            sed -i 's|^ *- MAIL_SIMULATE=.*|- MAIL_SIMULATE=${{ secrets.MAIL_SIMULATE }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_EMAIL_FROM_NAME=.*|- SMTP_EMAIL_FROM_NAME=${{ secrets.SMTP_EMAIL_FROM_NAME }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_EMAIL_FROM_ADDRESS=.*|- SMTP_EMAIL_FROM_ADDRESS=${{ secrets.SMTP_EMAIL_FROM_ADDRESS }}|' docker-compose.yml &&
+            sed -i 's|^ *- FRONTEND_URL=.*|- FRONTEND_URL=${{ secrets.FRONTEND_URL }}|' docker-compose.yml &&
           "
 
       - name: Build and deploy on server (with backup)
