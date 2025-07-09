@@ -8,23 +8,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      HEALTHCHECK_BACKEND: "http://${{ secrets.SERVER_HOST }}:8000/"
+      HEALTHCHECK_BACKEND: "http://${{ secrets.SERVER_HOST }}/api/health"
       HEALTHCHECK_FRONTEND: "http://${{ secrets.SERVER_HOST }}/"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: ./frontend/genstoryai_frontend
-
-      - name: Build frontend
-        run: pnpm run build
-        working-directory: ./frontend/genstoryai_frontend
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -53,10 +42,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            docker image tag genstoryai-fullstack:latest genstoryai-fullstack:last-success || true &&
-            docker build -t genstoryai-fullstack:latest . &&
-            docker stop genstoryai-fullstack || true && docker rm genstoryai-fullstack || true &&
-            docker run -d --name genstoryai-fullstack -p 80:80 genstoryai-fullstack:latest
+            docker image tag genstoryai-app:latest genstoryai-app:last-success || true &&
+            docker build -t genstoryai-app:latest . &&
+            docker stop genstoryai-app || true && docker rm genstoryai-app || true &&
+            docker run -d --name genstoryai-app -p 80:8000 genstoryai-app:latest
           "
 
       - name: Healthcheck Backend
@@ -73,6 +62,6 @@ jobs:
           echo "Healthcheck failed, rolling back..."
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            docker stop genstoryai-fullstack || true && docker rm genstoryai-fullstack || true &&
-            docker run -d --name genstoryai-fullstack -p 80:80 genstoryai-fullstack:last-success
+            docker stop genstoryai-app || true && docker rm genstoryai-app || true &&
+            docker run -d --name genstoryai-app -p 80:8000 genstoryai-app:last-success
           " 
