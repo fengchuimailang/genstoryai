@@ -32,14 +32,7 @@ app.add_middleware(
 
 add_middlewares(app)
 
-# 挂载静态文件
-static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
-if os.path.exists(static_dir):
-    # 静态资源缓存配置
-    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets"), check_dir=False), name="assets")
-    app.mount("/", StaticFiles(directory=static_dir, html=True, check_dir=False), name="static")
-
-# add router with /api prefix
+# add router with /api prefix - 必须在静态文件之前添加
 app.include_router(character_router, prefix="/api")
 app.include_router(story_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
@@ -51,6 +44,16 @@ async def root():
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "message": "GenStoryAI API is running"}
+
+@app.get("/api/test")
+async def test():
+    return {"message": "API test endpoint working"}
+
+# 挂载静态文件 - 在API路由之后
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if os.path.exists(static_dir):
+    # 静态资源缓存配置
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets"), check_dir=False), name="assets")
 
 # SPA路由处理 - 对于非API路由，返回index.html
 @app.get("/{full_path:path}")
