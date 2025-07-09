@@ -26,9 +26,9 @@ docker rm genstoryai-app 2>/dev/null || true
 echo "▶️ 启动新容器..."
 docker run -d \
     --name genstoryai-app \
-    -p 80:8000 \
+    -p 80:80 \
     --restart unless-stopped \
-    -e PORT=8000 \
+    -e PORT=80 \
     -e OPENAI_API_KEY=${OPENAI_API_KEY:-your-openai-key} \
     -e OPENAI_BASE_URL=${OPENAI_BASE_URL:-http://localhost:11434/v1} \
     -e OPENAI_MODEL=${OPENAI_MODEL:-qwen3:4b} \

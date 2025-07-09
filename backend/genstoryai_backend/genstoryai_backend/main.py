@@ -75,5 +75,5 @@ async def serve_spa(full_path: str, request: Request):
 
 if __name__ == "__main__":
     print_env_vars()
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 80))
     uvicorn.run(app, host="0.0.0.0", port=port)

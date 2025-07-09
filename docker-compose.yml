@@ -6,9 +6,9 @@ services:
     container_name: genstoryai-app
     restart: always
     ports:
-      - "80:8000"
+      - "80:80"
     environment:
-      - PORT=8000
+      - PORT=80
       - OPENAI_API_KEY=your-openai-key
       - OPENAI_BASE_URL=http://localhost:11434/v1
       - OPENAI_MODEL=qwen3:4b

@@ -41,7 +41,7 @@ docker build -t genstoryai-app:latest .
 # Run the container
 docker run -d \
     --name genstoryai-app \
-    -p 80:8000 \
+    -p 80:80 \
     --restart unless-stopped \
     genstoryai-app:latest
 ```
@@ -71,7 +71,7 @@ docker run -d \
 
 ### Environment Variables
 ```bash
-PORT=8000                          # Application port
+PORT=80                          # Application port
 OPENAI_API_KEY=your-openai-key     # OpenAI API key
 OPENAI_BASE_URL=http://localhost:11434/v1  # OpenAI base URL
 OPENAI_MODEL=qwen3:4b              # OpenAI model

@@ -164,7 +164,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
 - **布尔值**: 使用 is/has/can 前缀
 
 ```typescript
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://localhost:80';
 const MAX_RETRY_COUNT = 3;
 
 const userData = { name: 'John', email: 'john@example.com' };
