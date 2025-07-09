@@ -1,20 +1,34 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 from sqlmodel import SQLModel, Field
 from . import CommonBase
 from ..ssf.ssf import StorySchemaFormat
 from .genre import Genre
+from pydantic import BaseModel
+from datetime import datetime
 
+
+class OneLevelOutline(BaseModel):
+    title: str
+    content: str
+
+class TwoLevelOutline(BaseModel):
+    title: str
+    content: List[OneLevelOutline]
+
+class StoryOutline(BaseModel):
+    outline: Union[None, OneLevelOutline, TwoLevelOutline]
 
 class StoryBase(CommonBase, SQLModel):
     title: str = Field(description="The title of the story")
     creator_user_id: int = Field(description="The user id of the story")
-    # owner_user_id: int = Field(description="The owner user id of the story")
-    author: str = Field(description="The author of the story", default="")
-    genre: Genre = Field(default=Genre.FANTASY, description="The genre of the story")
-    summary: str = Field(description="The summary of the story", default="")
-    version: int = Field(default=1, description="版本号")
-    story_template_id: Optional[int] = Field(description="关联的故事模板 ID")
-    ssf: Optional[str] = Field(default=None, description="SSF 格式的故事")
+    author: Optional[str] = Field(description="The author of the story", default="")
+    genre: Optional[Genre] = Field(description="The genre of the story")
+    summary: Optional[str] = Field(description="The summary of the story", default="")
+    outline: Optional[str] = Field(description="The outline of the story", default="")
+    version_time: Optional[datetime] = Field(description="The version time of the story", default=datetime.now())
+    version_text: Optional[str] = Field(description="The version text of the story", default="")
+    story_template_id: Optional[int] = Field(description="The story template id")
+    ssf: Optional[str] = Field(description="SSF format story")
 
     @property
     def ssf_obj(self) -> Optional[StorySchemaFormat]:
@@ -34,6 +48,23 @@ class StoryBase(CommonBase, SQLModel):
         else:
             self.ssf = None
 
+    @property
+    def outline_obj(self) -> Optional[StoryOutline]:
+        if self.outline:
+            try:
+                return StoryOutline.model_validate_json(self.outline)
+            except ValueError as e:
+                print(f"Error parsing outline JSON: {e}")
+                return None
+        return None
+
+    @outline_obj.setter
+    def outline_obj(self, value: Optional[StoryOutline]):
+        if value:
+            self.outline = value.model_dump_json()
+        else:
+            self.outline = None
+
 class Story(StoryBase, table=True):
     id: int = Field(primary_key=True, index=True)
 
@@ -48,5 +79,7 @@ class StoryUpdate(CommonBase, SQLModel):
     author: Optional[str] = None
     genre: Optional[Genre] = None
     summary: Optional[str] = None
-    version: int = Field(default=1, description="版本号")
-    content_generation_ids: Optional[List[int]] = None
+    version_time: Optional[datetime] = None
+    version_text: Optional[str] = None
+    outline: Optional[str] = None
+    ssf: Optional[str] = None

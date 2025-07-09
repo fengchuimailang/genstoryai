@@ -5,7 +5,7 @@ from genstoryai_backend.models.story import Story, StoryCreate, StoryUpdate
 
 
 def create_story(db: Session, story: StoryCreate) -> Story:
-    db_story = Story(**story.dict())
+    db_story = Story(**story.model_dump(exclude_unset=True))
     db.add(db_story)
     db.commit()
     db.refresh(db_story)

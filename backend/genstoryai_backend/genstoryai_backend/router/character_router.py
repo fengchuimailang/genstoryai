@@ -5,7 +5,7 @@ from sqlmodel import Session
 from genstoryai_backend.database.db import get_db
 from genstoryai_backend.models.character import CharacterCreate,CharacterRead,CharacterUpdate
 from genstoryai_backend.database.crud import create_character, get_character, get_characters, update_character, delete_character
-from genstoryai_backend.agent.character_agent import generate_character
+from genstoryai_backend.agents.character_agent import generate_character
 
 character_router = APIRouter(
     prefix="/character",
