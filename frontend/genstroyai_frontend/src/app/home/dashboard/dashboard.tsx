@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+// import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { FileText, Star, MoreVertical, Grid, List, Search, Bell } from "lucide-react";
 import { useState } from "react";
-
+import CreateWorkModal from "./compoments/CreateWorkModal";
 const stats = [
   { value: "5", unit: "天", label: "制作天数", highlight: true },
   { value: "1.8", unit: "万", label: "总字数" },
@@ -23,7 +23,7 @@ const works = [
 export default function HomePage() {
   const [view, setView] = useState<"list" | "grid">("list");
   const [search, setSearch] = useState("");
-
+  const [modalOpen, setModalOpen] = useState(false);
   return (
     <div className="min-h-screen bg-[#f6f8fa]">
       {/* 顶部欢迎区 */}
@@ -33,7 +33,7 @@ export default function HomePage() {
             Hi，欢迎来到 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffb800] to-[#ff7a00]">GenstoryAI!</span>
           </h1>
         </div>
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="w-5 h-5" />
           </Button>
@@ -41,7 +41,7 @@ export default function HomePage() {
             <AvatarImage src="/avatars/user.jpg" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
-        </div>
+        </div> */}
       </div>
 
       {/* 创作看板 */}
@@ -63,7 +63,7 @@ export default function HomePage() {
         {/* 大的“开始创作”按钮卡片 */}
         <Card className="rounded-xl mt-6 bg-[#22b07d] border-none shadow-none">
           <CardContent className="flex items-center justify-center py-12">
-            <Button size="lg" className="bg-transparent text-white text-2xl font-bold hover:bg-[#1a8c63] flex items-center gap-2">
+            <Button size="lg" className="bg-transparent text-white text-2xl font-bold hover:bg-[#1a8c63] flex items-center gap-2" onClick={() => setModalOpen(true)}>
               <span className="text-3xl">+</span> 开始创作
             </Button>
           </CardContent>
@@ -83,7 +83,6 @@ export default function HomePage() {
                 className="w-40 h-8 text-sm bg-[#f6f8fa] border border-[#e5e7eb] rounded-md"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                prefix={<Search className="w-4 h-4 text-gray-400" />}
               />
               <Button
                 variant={view === "list" ? "secondary" : "ghost"}
@@ -133,6 +132,7 @@ export default function HomePage() {
         </Card>
       </div>
       <div className="h-10" />
+      <CreateWorkModal open={modalOpen} onOpenChange={setModalOpen} />
     </div>
   );
 }
