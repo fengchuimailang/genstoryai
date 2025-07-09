@@ -1,0 +1,15 @@
+# Frontend-specific .gitignore (for node, build, lock files, etc.)
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+*.log
+
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp

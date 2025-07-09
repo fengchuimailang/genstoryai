@@ -21,7 +21,7 @@ python-dotenv = ">=1.0.0,<2.0.0"
 passlib = ">=1.7.4,<2.0.0"
 bcrypt = ">=4.0.0,<5.0.0"
 python-jose = ">=3.3.0,<4.0.0"
-PyJWT = ">=2.8.0,<3.0.0"
+PyJWT = ">=2.8.0,<4.0.0"
 
 [tool.poetry.scripts]
 start = "genstoryai_backend.run:main"

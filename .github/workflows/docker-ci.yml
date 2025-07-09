@@ -1,0 +1,80 @@
+name: Build Docker Images (dev branch)
+
+on:
+  push:
+    branches: [ "dev" ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'docker-compose.yml'
+      - '**/Dockerfile'
+      - '**/Dockerfile.*'
+      - 'backend/**/pyproject.toml'
+      - 'backend/**/poetry.lock'
+      - 'backend/**/requirements.txt'
+      - 'frontend/**/package.json'
+      - 'frontend/**/package-lock.json'
+      - 'frontend/**/pnpm-lock.yaml'
+      - 'frontend/**/yarn.lock'
+  pull_request:
+    branches: [ "dev" ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'docker-compose.yml'
+      - '**/Dockerfile'
+      - '**/Dockerfile.*'
+      - 'backend/**/pyproject.toml'
+      - 'backend/**/poetry.lock'
+      - 'backend/**/requirements.txt'
+      - 'frontend/**/package.json'
+      - 'frontend/**/package-lock.json'
+      - 'frontend/**/pnpm-lock.yaml'
+      - 'frontend/**/yarn.lock'
+
+env:
+  BACKEND_PORT: 80
+  FRONTEND_PORT: 80
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/genstoryai_backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/genstoryai_backend
+          file: ./backend/genstoryai_backend/Dockerfile
+          push: false
+          tags: genstoryai-backend:dev
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend/genstoryai_frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend/genstoryai_frontend
+          file: ./frontend/genstoryai_frontend/Dockerfile
+          push: false
+          tags: genstoryai-frontend:dev
+          build-args: |
+            VITE_API_BASE_URL=http://backend:80 
