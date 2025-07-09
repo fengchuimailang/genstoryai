@@ -8,10 +8,10 @@ class ContentLevel(str):
     FULL_CONTENT = "full_content"
 
 class ContentGenerationBase(CommonBase, BaseModel):
-    level: ContentLevel = Field(description="内容层级，可以是章、节或者全文")
-    system_prompt: str = Field(description="生成内容的系统提示词")
-    user_prompt: str = Field(description="用户提示词")
-    generation: str = Field(description="生成内容", default="")
+    level: ContentLevel = Field(description="Content level, can be chapter, section, or full text")
+    system_prompt: str = Field(description="System prompt for content generation")
+    user_prompt: str = Field(description="User prompt")
+    generation: str = Field(description="Generated content", default="")
 
 class ContentGeneration(ContentGenerationBase):
     id: int
