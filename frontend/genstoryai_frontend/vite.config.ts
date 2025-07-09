@@ -18,7 +18,4 @@ export default defineConfig({
       '@constants': path.resolve(__dirname, './src/constants'),
     },
   },
-  define: {
-    'process.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL),
-  },
 })

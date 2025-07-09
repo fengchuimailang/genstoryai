@@ -17,9 +17,6 @@ RUN pnpm install --frozen-lockfile
 # 复制前端源代码
 COPY frontend/genstoryai_frontend/ ./
 
-# 设置构建时环境变量
-ENV VITE_API_BASE_URL=/api
-
 # 构建前端
 RUN pnpm run build
 
