@@ -23,12 +23,10 @@ services:
       - MAIL_SIMULATE=true
       - SMTP_EMAIL_FROM_NAME=example
       - SMTP_EMAIL_FROM_ADDRESS=notification@example.com
-      - FRONTEND_URL=http://localhost
+      - FRONTEND_URL=http://localhost:80
       - LOG_LEVEL=INFO
       - LOG_FILE=genstoryai.log
-      - VITE_API_BASE_URL=http://localhost:80
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: http://localhost:80
+
