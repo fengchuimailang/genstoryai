@@ -46,6 +46,7 @@ docker run -d \
     -e FRONTEND_URL=${FRONTEND_URL:-http://localhost} \
     -e LOG_LEVEL=${LOG_LEVEL:-INFO} \
     -e LOG_FILE=${LOG_FILE:-genstoryai.log} \
+    -e VITE_API_BASE_URL=${VITE_API_BASE_URL:-/api} \
     genstoryai-app:latest
 
 # 等待服务启动

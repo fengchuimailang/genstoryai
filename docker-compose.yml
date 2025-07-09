@@ -26,6 +26,9 @@ services:
       - FRONTEND_URL=http://localhost
       - LOG_LEVEL=INFO
       - LOG_FILE=genstoryai.log
+      - VITE_API_BASE_URL=/api
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
