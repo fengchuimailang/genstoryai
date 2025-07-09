@@ -2,7 +2,6 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from ..models.character import CharacterCreate
-from ..utils.i18n import trans 
 from ..config import settings
 
 
@@ -25,7 +24,7 @@ model = OpenAIModel(model_name=OPENAI_MODEL, provider=provider)
 character_agent = Agent(
     model,
     output_type=CharacterCreate,
-    system_prompt=trans("You are a helpful assistant that can help with character creation."),
+    system_prompt="You are a helpful assistant that can help with character creation.",
 )
 
 

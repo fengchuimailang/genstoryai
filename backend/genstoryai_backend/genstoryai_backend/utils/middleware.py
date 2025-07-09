@@ -1,6 +1,5 @@
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
-from genstoryai_backend.utils.i18n import active_translation
 
 
 def add_middlewares(app):
@@ -12,10 +11,3 @@ def add_middlewares(app):
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
-    @app.middleware("http")
-    async def get_accept_language(request: Request, call_next):
-        lang = request.headers.get("accept-language") or ""
-        active_translation(lang)
-        response = await call_next(request)
-        return response

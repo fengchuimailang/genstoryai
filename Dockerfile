@@ -25,9 +25,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# 安装系统依赖，包括gettext
+# 安装系统依赖
 RUN apt-get update && \
-    apt-get install -y gcc default-libmysqlclient-dev pkg-config gettext && \
+    apt-get install -y gcc default-libmysqlclient-dev pkg-config && \
     pip install "poetry==1.7.1" && \
     rm -rf /var/lib/apt/lists/*
 

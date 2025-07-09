@@ -5,13 +5,10 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from genstoryai_backend.utils.i18n import compile_translations
 from contextlib import asynccontextmanager
 from genstoryai_backend.config import print_env_vars
-compile_translations()
 
 from genstoryai_backend.utils.middleware import add_middlewares
-from genstoryai_backend.utils.i18n import trans 
 from genstoryai_backend.database.db import create_db_and_tables
 from genstoryai_backend.router import story_router
 from genstoryai_backend.router import character_router
@@ -49,7 +46,7 @@ app.include_router(user_router, prefix="/api")
 
 @app.get("/api/")
 async def root():
-    return {"message": trans("Welcome to GenStoryAI API")}
+    return {"message": "Welcome to GenStoryAI API"}
 
 @app.get("/api/health")
 async def health_check():
