@@ -1,12 +1,12 @@
 version: '3.9'
 
 services:
-  backend:
-    image: genstoryai-backend:dev
-    container_name: genstoryai-backend
+  app:
+    image: genstoryai-app:dev
+    container_name: genstoryai-app
     restart: always
     ports:
-      - 8000:8000
+      - "80:8000"
     environment:
       - PORT=8000
       - OPENAI_API_KEY=your-openai-key
@@ -23,19 +23,9 @@ services:
       - MAIL_SIMULATE=true
       - SMTP_EMAIL_FROM_NAME=example
       - SMTP_EMAIL_FROM_ADDRESS=notification@example.com
-      - FRONTEND_URL=http://localhost:5173
+      - FRONTEND_URL=http://localhost
       - LOG_LEVEL=INFO
       - LOG_FILE=genstoryai.log
-
-  frontend:
-    image: genstoryai-frontend:dev
-    container_name: genstoryai-frontend
-    restart: always
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
     build:
-      context: ./frontend/genstoryai_frontend
-      args:
-        VITE_API_BASE_URL: http://backend:8000
+      context: .
+      dockerfile: Dockerfile
