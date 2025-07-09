@@ -71,6 +71,7 @@ jobs:
 
       - name: Healthcheck Backend
         run: |
+          sleep 30
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "curl -fsSL --max-time 10 $HEALTHCHECK_BACKEND"
 
       - name: Healthcheck Frontend
