@@ -38,6 +38,14 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}/
 
+      - name: Update environment variables for production
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            cd ${{ secrets.SERVER_PROJECT_PATH }} &&
+            sed -i 's|http://localhost:80|http://${{ secrets.SERVER_HOST }}:80|g' docker-compose.yml &&
+            sed -i 's|http://localhost|http://${{ secrets.SERVER_HOST }}|g' docker-compose.yml
+          "
+
       - name: Build and deploy on server (with backup)
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
