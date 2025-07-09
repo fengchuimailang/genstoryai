@@ -57,7 +57,7 @@ src/
 
 ## API 配置
 
-后端 API 地址：`http://localhost:8000`
+后端 API 地址：`http://localhost:80`
 
 ### 主要 API 端点
 

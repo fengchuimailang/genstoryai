@@ -13,6 +13,7 @@ from genstoryai_backend.database.db import create_db_and_tables
 from genstoryai_backend.router import story_router
 from genstoryai_backend.router import character_router
 from genstoryai_backend.router import user_router
+from genstoryai_backend.router import health_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,21 +34,10 @@ app.add_middleware(
 add_middlewares(app)
 
 # add router with /api prefix - 必须在静态文件之前添加
+app.include_router(health_router, prefix="/api")
 app.include_router(character_router, prefix="/api")
 app.include_router(story_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
-
-@app.get("/api/")
-async def root():
-    return {"message": "Welcome to GenStoryAI API"}
-
-@app.get("/api/health")
-async def health_check():
-    return {"status": "healthy", "message": "GenStoryAI API is running"}
-
-@app.get("/api/test")
-async def test():
-    return {"message": "API test endpoint working"}
 
 # 挂载静态文件 - 在API路由之后
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
@@ -75,5 +65,5 @@ async def serve_spa(full_path: str, request: Request):
 
 if __name__ == "__main__":
     print_env_vars()
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 80))
     uvicorn.run(app, host="0.0.0.0", port=port)

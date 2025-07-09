@@ -49,7 +49,7 @@ COPY --from=frontend-builder /app/frontend/dist ./static
 # 创建静态文件目录（如果不存在）
 RUN mkdir -p ./static
 
-EXPOSE 8000
+EXPOSE 80
 
 # 启动FastAPI应用
 CMD ["poetry", "run", "start"] 

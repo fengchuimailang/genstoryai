@@ -1,7 +1,7 @@
 import type { AppConstants, Language } from '@/types';
 
 export const APP_CONSTANTS: AppConstants = {
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:80',
   APP_NAME: 'GenStoryAI',
   DEFAULT_LANGUAGE: 'zh',
   SUPPORTED_LANGUAGES: ['zh', 'en', 'ja', 'ko'],
