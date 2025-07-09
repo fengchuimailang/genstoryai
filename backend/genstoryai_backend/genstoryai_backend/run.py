@@ -5,7 +5,7 @@ def main():
     uvicorn.run(
         "genstoryai_backend.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=80,
         reload=True
     )
 

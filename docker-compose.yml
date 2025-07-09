@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  app:
+    image: genstoryai-app:dev
+    container_name: genstoryai-app
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - PORT=80
+      - OPENAI_API_KEY=your-openai-key
+      - OPENAI_BASE_URL=http://localhost:11434/v1
+      - OPENAI_MODEL=qwen3:4b
+      - DATABASE_URL=sqlite:///./genstoryai.db
+      - SECRET_KEY=your-secret-key
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=120
+      - SMTP_SERVER=your-mail-smtp.com
+      - SMTP_PORT=465
+      - SMTP_USERNAME=notification@example.com
+      - SMTP_PASSWORD=your-email-password
+      - MAIL_SIMULATE=true
+      - SMTP_EMAIL_FROM_NAME=example
+      - SMTP_EMAIL_FROM_ADDRESS=notification@example.com
+      - FRONTEND_URL=http://localhost
+      - LOG_LEVEL=INFO
+      - LOG_FILE=genstoryai.log
+      - VITE_API_BASE_URL=http://localhost:80
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:80
