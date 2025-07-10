@@ -1,7 +1,8 @@
 from typing import Generator
 from sqlmodel import SQLModel, create_engine, Session,select
 from genstoryai_backend.models.user import User
-from genstoryai_backend.models.story import Story
+from genstoryai_backend.models.story import Story, StoryCreate
+from genstoryai_backend.database.crud.story_crud import create_story
 from genstoryai_backend.models.character import Character
 from genstoryai_backend.models.enum.genre import Genre
 from genstoryai_backend.models.enum.gender import Gender
@@ -31,8 +32,7 @@ def init_db_with_default_data():
         # 默认故事
         story = session.exec(select(Story).where(Story.title == "擒虎英雄")).first()
         if not story:
-            story = Story(
-                id=1, 
+            storyCreate = StoryCreate(
                 title="擒虎英雄", 
                 creator_user_id=user.id, 
                 genre=Genre.ADVENTURE, 
@@ -44,8 +44,7 @@ def init_db_with_default_data():
                 story_template_id=None, 
                 language=Language.zh
             )
-            session.add(story)
-            session.commit()
+            story = create_story(session, storyCreate)
         # 默认角色
         character = session.exec(select(Character).where(Character.name == "李元霸")).first()
         if not character:
