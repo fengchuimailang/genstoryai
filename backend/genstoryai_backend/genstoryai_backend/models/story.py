@@ -1,10 +1,10 @@
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Any
 from sqlmodel import SQLModel, Field
 from genstoryai_backend.models import CommonBase
 from genstoryai_backend.models.enum.genre import Genre
 from genstoryai_backend.models.enum.language import Language
 from genstoryai_backend.ssf.ssf import StorySchemaFormat
-from pydantic import BaseModel, validator, field_validator
+from pydantic import BaseModel, validator, field_validator, computed_field
 import json
 from datetime import datetime
 
@@ -18,7 +18,7 @@ class TwoLevelOutline(BaseModel):
     content: List[OneLevelOutline]
 
 class StoryOutline(BaseModel):
-    outline: Union[None, OneLevelOutline, TwoLevelOutline]
+    outline: Union[List[OneLevelOutline], List[TwoLevelOutline]]
 
 class StoryBase(SQLModel):
     title: str = Field(description="The title of the story")
@@ -76,6 +76,28 @@ class StoryCreate(StoryBase):
 
 class StoryRead(StoryBase):
     id: int
+    outline: Any  # 覆盖父类的 outline 字段
+    ssf: Any  # 覆盖父类的 ssf 字段
+
+    @field_validator("outline", mode="before")
+    @classmethod
+    def parse_outline(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                return None
+        return v
+
+    @field_validator("ssf", mode="before")
+    @classmethod
+    def parse_ssf(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                return None
+        return v
 
 class StoryUpdate(StoryBase):
     title: Optional[str] = None
@@ -84,13 +106,14 @@ class StoryUpdate(StoryBase):
     summary: Optional[str] = None
     version_time: Optional[datetime] = None
     version_text: Optional[str] = None
-    outline: Optional[str] = None
+    outline: Optional[Union[str, list]] = None
+    story_template_id: Optional[int] = None
     ssf: Optional[str] = None
 
     @field_validator("outline", mode="before")
     @classmethod
     def outline_to_str(cls, v):
-        if isinstance(v, dict):
+        if isinstance(v, (dict, list)):
             return json.dumps(v, ensure_ascii=False)
         return v
     
