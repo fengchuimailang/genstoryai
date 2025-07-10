@@ -1,7 +1,7 @@
-from enum import Enum
 from typing import Optional
 from sqlmodel import SQLModel, Field
-from .story import Genre
+from genstoryai_backend.models.enum.genre import Genre
+from genstoryai_backend.models import CommonBase
 
 class StoryTemplateBase(SQLModel):
     genre: Genre = Field(description="Story genre")
@@ -9,7 +9,7 @@ class StoryTemplateBase(SQLModel):
     plot_template: str = Field(description="Plot template")
     character_template: str = Field(description="Character template")
 
-class StoryTemplate(StoryTemplateBase, table=True):
+class StoryTemplate(StoryTemplateBase,CommonBase, table=True):
     id: int = Field(primary_key=True, index=True)
 
 class StoryTemplateCreate(StoryTemplateBase):
@@ -18,7 +18,7 @@ class StoryTemplateCreate(StoryTemplateBase):
 class StoryTemplateRead(StoryTemplateBase):
     id: int
 
-class StoryTemplateUpdate(SQLModel):
+class StoryTemplateUpdate(StoryTemplateBase):
     genre: Optional[Genre] = None
     title_template: Optional[str] = None
     plot_template: Optional[str] = None
