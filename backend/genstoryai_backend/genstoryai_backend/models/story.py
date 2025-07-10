@@ -72,7 +72,22 @@ class Story(StoryBase,CommonBase, table=True):
     id: int = Field(primary_key=True, index=True)
 
 class StoryCreate(StoryBase):
-    pass
+    outline: Optional[Union[str, list, dict]] = None
+    ssf: Optional[Union[str, list, dict]] = None
+
+    @field_validator("outline", mode="before")
+    @classmethod
+    def outline_to_str(cls, v):
+        if isinstance(v, (dict, list)):
+            return json.dumps(v, ensure_ascii=False)
+        return v
+
+    @field_validator("ssf", mode="before")
+    @classmethod
+    def ssf_to_str(cls, v):
+        if isinstance(v, (dict, list)):
+            return json.dumps(v, ensure_ascii=False)
+        return v
 
 class StoryRead(StoryBase):
     id: int
