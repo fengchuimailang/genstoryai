@@ -2,6 +2,7 @@ from typing import Generator
 from sqlmodel import SQLModel, create_engine, Session,select
 from genstoryai_backend.models.user import User
 from genstoryai_backend.models.story import Story, StoryCreate
+from genstoryai_backend.database.crud.user_crud import get_password_hash
 from genstoryai_backend.database.crud.story_crud import create_story
 from genstoryai_backend.models.character import Character
 from genstoryai_backend.models.enum.genre import Genre
@@ -26,7 +27,7 @@ def init_db_with_default_data():
         # 默认用户
         user = session.exec(select(User).where(User.username == "admin")).first()
         if not user:
-            user = User(username="admin", email="admin@example.com", password="admin",is_active=True,is_verified=True)
+            user = User(username="admin", email="admin@example.com", password=get_password_hash("admin"),is_active=True,is_verified=True)
             session.add(user)
             session.commit()
         # 默认故事
