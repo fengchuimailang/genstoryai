@@ -1,12 +1,12 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
-from genstoryai_backend.models.story import StoryOutline
+from genstoryai_backend.models.character import CharacterRead
+from genstoryai_backend.models.story_content import StoryContentCreate
 from genstoryai_backend.models.story import Story
-from genstoryai_backend.agents.prompt_templete import OUTLINE_PROMPT
+from .prompt_templete import STORY_CONTENT_PROMPT
 from genstoryai_backend.config import settings
 from typing import List
-from genstoryai_backend.models.character import CharacterRead
 import json
 
 # model_provider
@@ -24,28 +24,30 @@ if OPENAI_MODEL is None:
 # agent
 provider = OpenAIProvider(api_key=OPENAI_API_KEY, base_url=OPENAI_BASE_URL)
 model = OpenAIModel(model_name=OPENAI_MODEL, provider=provider)
-story_agent = Agent(
+story_content_agent = Agent(
     model,
-    output_type=StoryOutline,
-    system_prompt="You are an expert story planner and narrative architect. You excel at creating well-structured story outlines that provide clear direction for story development. You understand story structure, pacing, and genre conventions, and can create outlines that serve as effective roadmaps for writers.",
+    output_type=StoryContentCreate,
+    system_prompt="You are an expert creative writer specializing in story content generation. You excel at creating engaging, well-structured narrative content that follows story outlines and maintains consistency with established themes, characters, and plot elements. You understand various literary genres and can adapt your writing style accordingly.",
 )
 
-async def generate_story_outline(story: Story, characterReads: List[CharacterRead], outline_level: int = 1) -> StoryOutline | None:
-    """generate story outline by information in database"""
-    assert outline_level in [1, 2], "Outline level must be 1 or 2"
-    
+async def generate_story_content(story: Story, characterReads: List[CharacterRead],outline_title: str) -> StoryContentCreate | None:
+    """generate story content by information in database"""
+    # Convert genre object to string if it exists
+    genre_str = story.genre.name if story.genre else "Unknown"
+
     characters_data = [character.model_dump(exclude_unset=True) for character in characterReads]
     characters_json = json.dumps(characters_data, ensure_ascii=False, indent=2)
 
-    user_prompt = OUTLINE_PROMPT.format(
+    user_prompt = STORY_CONTENT_PROMPT.format(
         story.title, 
-        story.genre.name if story.genre else "Unknown", 
+        genre_str,
         story.summary or "", 
-        outline_level,
+        story.outline or "", 
+        outline_title,
         story.language,
         characters_json
     )
-    result = await story_agent.run(user_prompt)
+    result = await story_content_agent.run(user_prompt)
     if hasattr(result, 'output'):
         return result.output
     return None
