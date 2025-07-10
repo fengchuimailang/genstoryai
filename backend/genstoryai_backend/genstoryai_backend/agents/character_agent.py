@@ -1,8 +1,10 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
-from ..models.character import CharacterCreate
-from ..config import settings
+from genstoryai_backend.models.character import CharacterCreate
+from genstoryai_backend.models.story import Story
+from .prompt_templete import CHARACTER_CREATION_PROMPT
+from genstoryai_backend.config import settings
 
 
 # model_provider
@@ -24,13 +26,15 @@ model = OpenAIModel(model_name=OPENAI_MODEL, provider=provider)
 character_agent = Agent(
     model,
     output_type=CharacterCreate,
-    system_prompt="You are a helpful assistant that can help with character creation.",
+    system_prompt="You are an expert character designer and development specialist. You excel at creating compelling, well-rounded characters with distinct personalities, motivations, and arcs. You understand character psychology, development techniques, and how to create memorable characters that drive story progression.",
 )
 
 
-async def generate_character(user_prompt: str) -> CharacterCreate | None:
+async def generate_character(user_prompt: str,story: Story) -> CharacterCreate | None:
     """generate character by user_prompt"""
-    result = await character_agent.run(user_prompt)
+    # Use the template to structure the prompt
+    formatted_prompt = CHARACTER_CREATION_PROMPT.format(user_prompt,story.title,story.genre,story.summary,story.language)
+    result = await character_agent.run(formatted_prompt)
     if hasattr(result, 'output'):
         return result.output
     return None

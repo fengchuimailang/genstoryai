@@ -1,17 +1,17 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from . import CommonBase
 from datetime import datetime
+from sqlmodel import SQLModel, Field
 
-class TimelineBase(CommonBase, BaseModel):
-    name: str
-    start_time: datetime
-    end_time: datetime
-    description: str | None = None
+class TimelineBase(SQLModel):
+    name: str = Field(description="The name of the timeline")
+    start_time: datetime = Field(description="The start time of the timeline")
+    end_time: datetime = Field(description="The end time of the timeline")
+    description: str = Field(description="The description of the timeline")
 
-class Timeline(TimelineBase):
-    id: int
-    events: List[int] = []
+class Timeline(TimelineBase,CommonBase, table=True):
+    id: int = Field(default=None, primary_key=True, index=True)
 
 class TimelineCreate(TimelineBase):
     pass
@@ -19,15 +19,8 @@ class TimelineCreate(TimelineBase):
 class TimelineRead(TimelineBase):
     id: int
 
-    class Config:
-        orm_mode = True
-
-class TimelineUpdate(CommonBase, BaseModel):
-    name: str | None = None
-    start_time: datetime | None = None
-    end_time: datetime | None = None
-    description: str | None = None
-    events: List[int] | None = None
-
-    class Config:
-        orm_mode = True
+class TimelineUpdate(TimelineBase):
+    name: Optional[str] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    description: Optional[str] = None

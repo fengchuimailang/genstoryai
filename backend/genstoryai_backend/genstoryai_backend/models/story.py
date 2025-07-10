@@ -1,9 +1,11 @@
 from typing import Optional, List, Union
 from sqlmodel import SQLModel, Field
-from . import CommonBase
-from ..ssf.ssf import StorySchemaFormat
-from .genre import Genre
-from pydantic import BaseModel
+from genstoryai_backend.models import CommonBase
+from genstoryai_backend.models.enum.genre import Genre
+from genstoryai_backend.models.enum.language import Language
+from genstoryai_backend.ssf.ssf import StorySchemaFormat
+from pydantic import BaseModel, validator, field_validator
+import json
 from datetime import datetime
 
 
@@ -18,15 +20,16 @@ class TwoLevelOutline(BaseModel):
 class StoryOutline(BaseModel):
     outline: Union[None, OneLevelOutline, TwoLevelOutline]
 
-class StoryBase(CommonBase, SQLModel):
+class StoryBase(SQLModel):
     title: str = Field(description="The title of the story")
     creator_user_id: int = Field(description="The user id of the story")
-    author: Optional[str] = Field(description="The author of the story", default="")
+    author: Optional[str] = Field(description="The author of the story")
+    language: Optional[Language] = Field(description="The language of the story", default=Language.zh)
     genre: Optional[Genre] = Field(description="The genre of the story")
-    summary: Optional[str] = Field(description="The summary of the story", default="")
-    outline: Optional[str] = Field(description="The outline of the story", default="")
+    summary: Optional[str] = Field(description="The summary of the story")
+    outline: Optional[str] = Field(description="The outline of the story")
     version_time: Optional[datetime] = Field(description="The version time of the story", default=datetime.now())
-    version_text: Optional[str] = Field(description="The version text of the story", default="")
+    version_text: Optional[str] = Field(description="The version text of the story")
     story_template_id: Optional[int] = Field(description="The story template id")
     ssf: Optional[str] = Field(description="SSF format story")
 
@@ -65,7 +68,7 @@ class StoryBase(CommonBase, SQLModel):
         else:
             self.outline = None
 
-class Story(StoryBase, table=True):
+class Story(StoryBase,CommonBase, table=True):
     id: int = Field(primary_key=True, index=True)
 
 class StoryCreate(StoryBase):
@@ -74,7 +77,7 @@ class StoryCreate(StoryBase):
 class StoryRead(StoryBase):
     id: int
 
-class StoryUpdate(CommonBase, SQLModel):
+class StoryUpdate(StoryBase):
     title: Optional[str] = None
     author: Optional[str] = None
     genre: Optional[Genre] = None
@@ -83,3 +86,17 @@ class StoryUpdate(CommonBase, SQLModel):
     version_text: Optional[str] = None
     outline: Optional[str] = None
     ssf: Optional[str] = None
+
+    @field_validator("outline", mode="before")
+    @classmethod
+    def outline_to_str(cls, v):
+        if isinstance(v, dict):
+            return json.dumps(v, ensure_ascii=False)
+        return v
+    
+    @field_validator("ssf", mode="before")
+    @classmethod
+    def ssf_to_str(cls, v):
+        if isinstance(v, dict):
+            return json.dumps(v, ensure_ascii=False)
+        return v
