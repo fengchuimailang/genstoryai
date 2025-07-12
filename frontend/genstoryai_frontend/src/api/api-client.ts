@@ -10,7 +10,6 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
-
 class ApiClient {
   private baseURL: string;
 
