@@ -1,5 +1,5 @@
-from typing import Optional, List, Union, Any
-from sqlmodel import SQLModel, Field
+from typing import Optional, List, Union, Any, TYPE_CHECKING
+from sqlmodel import SQLModel, Field, Relationship
 from genstoryai_backend.models import CommonBase
 from genstoryai_backend.models.enum.genre import Genre
 from genstoryai_backend.models.enum.language import Language
@@ -7,6 +7,9 @@ from genstoryai_backend.ssf.ssf import StorySchemaFormat
 from pydantic import BaseModel, validator, field_validator, computed_field
 import json
 from datetime import datetime
+
+if TYPE_CHECKING:
+    from genstoryai_backend.models.timeline import Timeline
 
 
 class OneLevelOutline(BaseModel):
@@ -70,9 +73,27 @@ class StoryBase(SQLModel):
 
 class Story(StoryBase,CommonBase, table=True):
     id: int = Field(primary_key=True, index=True)
+    
+    # 关联到时间线（一对一）
+    timeline: Optional["Timeline"] = Relationship(back_populates="story")
 
 class StoryCreate(StoryBase):
-    pass
+    outline: Optional[Union[str, list, dict]] = None
+    ssf: Optional[Union[str, list, dict]] = None
+
+    @field_validator("outline", mode="before")
+    @classmethod
+    def outline_to_str(cls, v):
+        if isinstance(v, (dict, list)):
+            return json.dumps(v, ensure_ascii=False)
+        return v
+
+    @field_validator("ssf", mode="before")
+    @classmethod
+    def ssf_to_str(cls, v):
+        if isinstance(v, (dict, list)):
+            return json.dumps(v, ensure_ascii=False)
+        return v
 
 class StoryRead(StoryBase):
     id: int
