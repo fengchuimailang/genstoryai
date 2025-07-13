@@ -1,14 +1,23 @@
 from typing import Generator
 from sqlmodel import SQLModel, create_engine, Session,select
+from datetime import datetime
 from genstoryai_backend.models.user import User
 from genstoryai_backend.models.story import Story, StoryCreate
 from genstoryai_backend.database.crud.user_crud import get_password_hash
 from genstoryai_backend.database.crud.story_crud import create_story
 from genstoryai_backend.models.character import Character
+from genstoryai_backend.models.character_event import CharacterEvent
+from genstoryai_backend.models.character_relationship import CharacterRelationship
+from genstoryai_backend.models.event import Event
+from genstoryai_backend.models.timeline import Timeline
 from genstoryai_backend.models.enum.genre import Genre
 from genstoryai_backend.models.enum.gender import Gender
 from genstoryai_backend.models.enum.mbti import MBTI
 from genstoryai_backend.models.enum.language import Language
+from genstoryai_backend.models.enum.location_type import LocationType
+from genstoryai_backend.models.location import Location
+# 导入新的会话相关模型
+from genstoryai_backend.models.session import Session as SessionModel, SessionMessage, Tool, ToolUsage
 
 # 创建 SQLite 数据库引擎
 SQLALCHEMY_DATABASE_URL = "sqlite:///./genstoryai.db"
@@ -40,18 +49,66 @@ def init_db_with_default_data():
                 ssf=None, 
                 author=None, 
                 summary=None, 
-                outline=None, 
+                outline=[
+  {
+    "title": "第一章：英雄的崛起",
+    "content": "介绍李元霸的背景和他在唐朝军队中的地位，展现他的勇猛和忠诚。"
+  },
+  {
+    "title": "第二章：边疆的危机",
+    "content": "唐朝边疆受到外敌入侵，李元霸被派往前线，肩负起保卫国家的重任。"
+  },
+  {
+    "title": "第三章：力挽狂澜",
+    "content": "李元霸在战场上展现出非凡的战斗力，带领军队击退敌人，成为国家的英雄。"
+  },
+  {
+    "title": "第四章：和平的代价",
+    "content": "战争结束后，李元霸反思战争的残酷，决心为国家的长治久安而努力。"
+  },
+  {
+    "title": "第五章：英雄的归宿",
+    "content": "李元霸的晚年生活，他成为年轻一代的榜样，留下不朽的传奇。"
+  }
+], 
                 version_text=None, 
                 story_template_id=None, 
                 language=Language.zh
             )
             story = create_story(session, storyCreate)
+        # 默认时间线
+        timeline = session.exec(select(Timeline).where(Timeline.story_id == story.id)).first()
+        if not timeline:
+            timeline = Timeline(
+                story_id=story.id,
+                name="擒虎英雄时间线",
+                description="李元霸擒虎故事的主要时间线",
+                start_time=datetime.now(),
+                end_time=None
+            )
+            session.add(timeline)
+            session.commit()
+        
+        # 默认地点
+        chang_an = session.exec(select(Location).where(Location.name == "长安城")).first()
+        if not chang_an:
+            chang_an = Location(
+                name="长安城",
+                story_id=story.id,
+                description="唐朝的都城，繁华的国际化大都市，是政治、经济、文化中心",
+                location_type=LocationType.CAPITAL,
+                x=0.0,
+                y=0.0
+            )
+            session.add(chang_an)
+            session.commit()
+        
         # 默认角色
         character = session.exec(select(Character).where(Character.name == "李元霸")).first()
         if not character:
             character = Character(
                 name="李元霸", 
-                story_id=story.id, 
+                story_id=story.id,
                 is_main=True, 
                 gender=Gender.MALE, 
                 age=20, 

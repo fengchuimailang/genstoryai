@@ -106,4 +106,26 @@ export const useAuthStore = create<AuthStore>()(
       },
     }
   )
+);
+
+interface StoryState {
+  currentStory: any | null;
+}
+interface StoryActions {
+  setCurrentStory: (story: any) => void;
+}
+
+type StoryStore = StoryState & StoryActions;
+
+export const useStoryStore = create<StoryStore>()(
+  persist(
+    (set) => ({
+      currentStory: null,
+      setCurrentStory: (story) => set({ currentStory: story }),
+    }),
+    {
+      name: 'story-storage',
+      version: 1,
+    }
+  )
 ); 

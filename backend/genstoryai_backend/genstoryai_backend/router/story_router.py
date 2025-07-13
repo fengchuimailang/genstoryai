@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from typing import List
 
-from ..database.db import get_db
-from ..models.story import Story, StoryCreate, StoryRead, StoryUpdate, StoryOutline
-from ..database.crud import create_story, get_story, get_stories, update_story, delete_story
-from ..agents.story_agent import generate_story_outline
-from ..database.crud.character_crud import get_characters_by_story_id
-from ..models.character import CharacterRead
+from genstoryai_backend.database.db import get_db
+from genstoryai_backend.models.story import Story, StoryCreate, StoryRead, StoryUpdate, StoryOutline
+from genstoryai_backend.database.crud import create_story, get_story, get_stories, update_story, delete_story
+from genstoryai_backend.agents import UnifiedAgent
+from genstoryai_backend.database.crud.character_crud import get_characters_by_story_id
+from genstoryai_backend.models.character import CharacterRead
 
 
 story_router = APIRouter(
@@ -57,5 +57,10 @@ async def create_story_outline_endpoint(story_id: int, outline_level: int, db: S
         raise HTTPException(status_code=404, detail="Story not found")
     characters = get_characters_by_story_id(db, story_id)
     characterReads = [CharacterRead.model_validate(character) for character in characters]
-    outline = await generate_story_outline(story, characterReads, outline_level)
+    
+    # 使用统一代理
+    agent = UnifiedAgent(db_session=db)
+    import uuid
+    session_id = uuid.uuid4()  # 这里应该从请求中获取真实的 session_id
+    outline = await agent.generate_story_outline(session_id, story, characterReads, outline_level)
     return outline

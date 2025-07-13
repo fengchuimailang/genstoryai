@@ -3,17 +3,18 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuthStore } from './lib/store';
 import LoginPage from './app/login/page';
 import RegisterPage from './app/register/page';
-import HomePage from './app/home/page';
+import HomePage from './app/home/home';
 import TestPage from './app/test/page';
 import VerifyEmailPage from './app/verify-email/page';
+import GenerationPage from './app/Generation/page';
 
 // 受保护的路由组件
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore();
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/login" replace />;
+  // }
   
   return <>{children}</>;
 };
@@ -60,10 +61,18 @@ const AppRouter = () => {
         
         {/* 受保护的路由 */}
         <Route 
-          path="/home" 
+          path="/home/*" 
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/generation" 
+          element={
+            <ProtectedRoute>
+              <GenerationPage />
             </ProtectedRoute>
           } 
         />
