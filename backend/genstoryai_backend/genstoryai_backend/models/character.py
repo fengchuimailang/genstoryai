@@ -3,6 +3,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from genstoryai_backend.models import CommonBase
 from genstoryai_backend.models.enum.gender import Gender
 from genstoryai_backend.models.enum.mbti import MBTI
+from genstoryai_backend.models.character_event import CharacterEvent
 
 if TYPE_CHECKING:
     from genstoryai_backend.models.event import Event
@@ -33,7 +34,7 @@ class Character(CharacterBase, CommonBase, table=True):
     # 关联到事件（多对多，可选）
     events: List["Event"] = Relationship(
         back_populates="characters",
-        link_model="CharacterEvent"
+        link_model=CharacterEvent
     )
     
 

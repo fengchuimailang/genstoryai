@@ -2,6 +2,7 @@ from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from genstoryai_backend.models import CommonBase
 from datetime import datetime
+from genstoryai_backend.models.character_event import CharacterEvent
 
 if TYPE_CHECKING:
     from genstoryai_backend.models.character import Character
@@ -20,9 +21,6 @@ class EventBase(SQLModel):
     
     # 事件类型
     event_description: Optional[str] = Field(description="事件描述", default=None)
-    
-    # 父事件ID（支持事件层级）
-    parent_event_id: Optional[int] = Field(description="父事件ID", default=None)
 
 class Event(EventBase, CommonBase, table=True):
     """事件模型"""
@@ -36,10 +34,13 @@ class Event(EventBase, CommonBase, table=True):
     location_id: Optional[int] = Field(foreign_key="location.id", default=None)
     location: Optional["Location"] = Relationship(back_populates="events")
     
+    # 父事件ID（支持事件层级）
+    parent_event_id: Optional[int] = Field(foreign_key="event.id", default=None)
+    
     # 关联到角色（多对多，可选）
     characters: List["Character"] = Relationship(
         back_populates="events",
-        link_model="CharacterEvent"
+        link_model=CharacterEvent
     )
     
     # 子事件（一对多）
@@ -51,16 +52,17 @@ class Event(EventBase, CommonBase, table=True):
     # 父事件（多对一）
     parent_event: Optional["Event"] = Relationship(
         back_populates="sub_events",
-        sa_relationship_kwargs={"foreign_keys": "Event.parent_event_id"}
+        sa_relationship_kwargs={"foreign_keys": "Event.parent_event_id", "remote_side": "Event.id"}
     )
 
 class EventCreate(EventBase):
     """创建事件"""
-    pass
+    parent_event_id: Optional[int] = Field(description="父事件ID", default=None)
 
 class EventRead(EventBase):
     """读取事件"""
     id: int
+    parent_event_id: Optional[int] = None
     location_name: Optional[str] = None
     sub_event_count: int = 0
 
