@@ -32,7 +32,8 @@ export interface VerificationResponse {
 
 // 注册用户
 export const registerUser = async (userData: UserCreate): Promise<User> => {
-  return apiClient.post<User>('/api/user/register', userData);
+  const res = await apiClient.post<User>('/api/user/register', userData);
+  return res.data;
 };
 
 // 用户登录
@@ -41,22 +42,27 @@ export const loginUser = async (loginData: LoginRequest): Promise<LoginResponse>
   formData.append('username', loginData.username);
   formData.append('password', loginData.password);
 
-  return apiClient.postForm<LoginResponse>('/api/user/token', formData);
+  const res = await apiClient.post<LoginResponse>('/api/user/token', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return res.data;
 };
 
 // 获取当前用户信息
 export const getCurrentUser = async (token: string): Promise<User> => {
-  return apiClient.get<User>('/api/user/users/me/', {
-    'Authorization': `Bearer ${token}`,
+  const res = await apiClient.get<User>('/api/user/users/me/', {
+    headers: { 'Authorization': `Bearer ${token}` }
   });
+  return res.data;
 };
 
 // 验证邮箱
 export const verifyEmail = async (token: string): Promise<VerificationResponse> => {
-  return apiClient.get<VerificationResponse>(`/api/user/verify-email?token=${token}`);
+  const res = await apiClient.get<VerificationResponse>(`/api/user/verify-email?token=${token}`);
+  return res.data;
 };
 
 // 重新发送验证邮件
 export const resendVerificationEmail = async (email: string): Promise<void> => {
-  return apiClient.post<void>('/api/user/resend-verification', { email });
+  await apiClient.post<void>('/api/user/resend-verification', { email });
 };
