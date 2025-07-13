@@ -23,6 +23,7 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0); // 保留total, 因为后续有用到
 
   // 获取故事列表
   const fetchStories = async (params?: { page?: number; search?: string }) => {
@@ -35,6 +36,8 @@ export default function HomePage() {
         setStories(res);
       } else {
         setStories(res.data || []);
+        setTotal(res.total || 0);
+        total
       }
     } catch (e) {
       setStories([]);

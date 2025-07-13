@@ -133,7 +133,7 @@ export enum StoryGenre {
   contemporary = '现代',
 }
 
-export enum Language {
+export enum Languages {
   zh = '中文',
   en = '英文',
   ja = '日文',
