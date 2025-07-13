@@ -6,11 +6,10 @@ import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Alert } from '../../components/ui/alert';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
-import { loginUser, getCurrentUser } from '../../api/auth-api';
 import { useAuthStore } from '../../lib/store';
 import { getErrorMessage } from '../../lib/error-handler';
 import { i18n } from '../../lib/i18n';
-
+import { loginUser,getCurrentUser } from "../../api/auth-api";
 export default function LoginPage() {
   const navigate = useNavigate();
   const { isLoading, setLoading, setUser, setToken, setError } = useAuthStore();
