@@ -6,14 +6,13 @@ import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Alert } from '../../components/ui/alert';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
-import { loginUser, getCurrentUser } from '../../api/auth-api';
 import { useAuthStore } from '../../lib/store';
 import { getErrorMessage } from '../../lib/error-handler';
 import { i18n } from '../../lib/i18n';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setUser, setToken, setError, clearError, isLoading, setLoading } = useAuthStore();
+  const { setError, isLoading, setLoading } = useAuthStore();
   
   const [formData, setFormData] = useState({
     username: '123', // 可以是邮箱或用户名
