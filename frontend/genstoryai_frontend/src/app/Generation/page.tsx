@@ -96,7 +96,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   onForceExpand?: () => void;
   onCollapse?: () => void;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(isEditingDefault);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAICard, setShowAICard] = useState(false);
@@ -169,7 +169,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   };
   // 判断是否有修改
   const isModified = () => {
-    return Object.keys(form).some(key => form[key as keyof RoleType] !== role[key as keyof RoleType]);
+    return Object.keys(form).some(key => form[key] !== role[key]);
   };
   // 保存
   const handleSave = async () => {
@@ -274,12 +274,12 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   };
 
   return (
-    <div className="bg-[#f6f8fa] rounded-2xl p-4 px-6 shadow-sm ">
-      <div className="flex items-center mb-3">
+    <div className="bg-[#f6f8fa] rounded-2xl p-4 px-6 shadow-sm relative transition-all duration-300" style={{ minHeight: collapsed ? 56 : undefined }}>
+      <div className="flex items-center">
         <Avatar className="w-8 h-8 mr-2">
           <AvatarImage src="/avatars/user.jpg" />
         </Avatar>
-        <span className="font-bold text-base">{role.name || "未命名"}</span>
+        <span className="font-bold text-base cursor-pointer select-none" onClick={() => setCollapsed(v => !v)}>{role.name || "未命名"}</span>
         <div className="ml-auto flex gap-2 items-center">
           {/* AI生成按钮仅编辑时显示 */}
           {isEditing && (
@@ -299,7 +299,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
             </Button>
           )}
           {!isEditing ? (
-            <Edit className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={() => setIsEditing(true)} />
+            <Edit className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={handleEdit} />
           ) : (
             <span
               className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0CB994] ml-1 cursor-pointer"
@@ -312,7 +312,12 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
               )}
             </span>
           )}
-          <Trash2 className="w-4 h-4 cursor-pointer text-red-500 hover:text-red-600" onClick={onDelete} />
+          <Trash2 className="w-4 h-4 cursor-pointer text-red-500 hover:text-red-600" onClick={handleDelete} />
+          {collapsed ? (
+            <ChevronUp className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={() => setCollapsed(false)} />
+          ) : (
+            <ChevronDown className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={() => setCollapsed(true)} />
+          )}
         </div>
       </div>
       {/* AI生成弹出卡片内容 */}
