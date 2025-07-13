@@ -1,6 +1,6 @@
 // 导出 API 客户端
-export { apiClient, ApiClient } from './api-client';
-export type { ApiError, ApiResponse } from './api-client';
+export { apiClient } from './api-client';
+// export type { ApiError, ApiResponse } from './api-client';
 
 // 导出认证相关 API
 export {
