@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 // import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 // import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Star, MoreVertical, Grid, List, Search, Bell, Trash2, Edit, Eye } from "lucide-react";
+import { FileText, Grid, List, Trash2, Edit, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import CreateWorkModal from "./compoments/CreateWorkModal";
 import { getStoryList } from '@/api/story-api';
@@ -15,12 +15,6 @@ const stats = [
   { value: "5", unit: "天", label: "rectangle" },
 ];
 
-const works = [
-  { name: "午夜拉面里的秘密", time: "2025-01-01 18:23" },
-  { name: "当最后一颗番茄落在生锈的铁门上时", time: "2025-01-01 18:23" },
-  { name: "穿过第七个青萝才能抵达的遗忘之城", time: "2025-01-01 18:23" },
-];
-
 export default function HomePage() {
   const [view, setView] = useState<"list" | "grid">("list");
   const [search, setSearch] = useState("");
@@ -29,7 +23,6 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
 
   // 获取故事列表
   const fetchStories = async (params?: { page?: number; search?: string }) => {
@@ -40,14 +33,11 @@ export default function HomePage() {
       const res = await getStoryList({ skip, limit, search: params?.search ?? search });
       if (Array.isArray(res)) {
         setStories(res);
-        setTotal(res.length < pageSize ? skip + res.length : skip + pageSize + 1);
       } else {
         setStories(res.data || []);
-        setTotal(res.total || 0);
       }
     } catch (e) {
       setStories([]);
-      setTotal(0);
     } finally {
       setLoading(false);
     }

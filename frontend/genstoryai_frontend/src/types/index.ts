@@ -89,7 +89,7 @@ export interface RouteConfig {
 }
 
 // 国际化相关类型
-export type Language = 'zh' | 'en' | 'ja' | 'ko';
+export type AppLanguage = 'zh' | 'en' | 'ja' | 'ko';
 
 export interface TranslationKeys {
   common: Record<string, string>;
@@ -115,8 +115,8 @@ export interface ValidationError {
 export interface AppConstants {
   API_BASE_URL: string;
   APP_NAME: string;
-  DEFAULT_LANGUAGE: Language;
-  SUPPORTED_LANGUAGES: Language[];
+  DEFAULT_LANGUAGE: AppLanguage;
+  SUPPORTED_LANGUAGES: AppLanguage[];
   TOKEN_KEY: string;
   USER_KEY: string;
 }
@@ -156,4 +156,11 @@ export interface Story {
   create_time?: string;
   update_time?: string;
   is_deleted?: boolean;
-} 
+}
+
+export const GENDER_MAP = {
+  male: '男',
+  female: '女',
+  other: '其他',
+} as const;
+export type Gender = keyof typeof GENDER_MAP; 
