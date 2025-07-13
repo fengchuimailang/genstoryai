@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { StoryGenre, Language } from '@/types';
+import { StoryGenre, Languages } from '@/types';
 import { createStory } from '@/api/story-api';
 import { useStoryStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/store';
@@ -123,7 +123,7 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
             <div className="flex items-center">
               <div className="w-24 text-base font-bold text-left text-[#222]">选择语言</div>
               <div className="flex gap-6 flex-1">
-                {Object.entries(Language).map(([key, label]) => (
+                {Object.entries(Languages).map(([key, label]) => (
                   <label key={key} className="flex items-center gap-1 cursor-pointer text-base font-normal h-10">
                     <input type="radio" checked={language === key} onChange={() => setLanguage(key)} className="accent-[#00AD88] w-4 h-4" />
                     {label as string}

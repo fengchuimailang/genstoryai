@@ -13,11 +13,11 @@ import { i18n } from '../../lib/i18n';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setUser, setToken, setError, clearError, isLoading, setLoading } = useAuthStore();
+  const { isLoading, setLoading, setUser, setToken, setError } = useAuthStore();
   
   const [formData, setFormData] = useState({
-    username: '123', // 可以是邮箱或用户名
-    password: '123',
+    username: 'admin', // 可以是邮箱或用户名
+    password: 'admin',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,27 +31,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // clearError();
-
+    setError(null);
     try {
       setLoading(true);
-      
-      // // 登录
-      // const loginResponse = await loginUser({
-      //   username: formData.username,
-      //   password: formData.password,
-      // });
-
-      // // 保存 token
-      // setToken(loginResponse.access_token);
-
-      // // 获取用户信息
-      // const user = await getCurrentUser(loginResponse.access_token);
-      // setUser(user);
-
+      // 登录
+      const loginResponse = await loginUser({
+        username: formData.username,
+        password: formData.password,
+      });
+      // 保存 token
+      setToken(loginResponse.access_token);
+      // 获取用户信息
+      const user = await getCurrentUser(loginResponse.access_token);
+      setUser(user);
       // 登录成功，跳转到首页
-      console.log('登录成功');
-      
       navigate('/home');
     } catch (error) {
       const errorMessage = getErrorMessage(error);

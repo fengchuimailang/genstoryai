@@ -1,4 +1,4 @@
-import { Link, Routes, Route, useLocation, Outlet, Navigate } from "react-router-dom";
+import { Link, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Bell, Home, BookOpen, Trash2, HelpCircle } from "lucide-react";
