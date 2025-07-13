@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY pnpm-lock.yaml ./
 RUN npm install -g pnpm
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # 复制源代码
 COPY . .

@@ -13,7 +13,7 @@ tips
 from pydantic import BaseModel,Field
 from typing import List
 
-from ..models.genre import Genre
+from genstoryai_backend.models.enum.genre import Genre
 
 class _Metadata(BaseModel):
     title: str = Field(description="The title of the story")

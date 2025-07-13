@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Edit, Trash2, Check, Eye, ChevronDown, ChevronUp, Mic } from "lucide-react";
+import { Edit, Trash2, Check, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
 import { useStoryStore } from '@/lib/store';
 import axios from 'axios';
 import { GENDER_MAP } from '@/types';
-import type { Gender } from '@/types';
 const initialRole = {
   id: '',
   name: '',
@@ -84,19 +83,14 @@ function LabeledInput({ label, value, onChange, required, readOnly, fieldKey }: 
   );
 }
 
-function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault = false, isNew = false, onDeleteConfirm, forceCollapsed, onForceExpand, onCollapse }: {
+function RoleCardOptimized({ role, onChange, onDelete, onDeleteConfirm, forceCollapsed }: {
   role: RoleType;
   onChange: (key: keyof RoleType, value: string) => void;
-  onSave: (role: RoleType) => Promise<void>;
   onDelete?: () => void;
-  isEditingDefault?: boolean;
-  isNew?: boolean;
   onDeleteConfirm?: () => void;
   forceCollapsed?: boolean;
-  onForceExpand?: () => void;
-  onCollapse?: () => void;
 }) {
-  const [isEditing, setIsEditing] = useState(isEditingDefault);
+  const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAICard, setShowAICard] = useState(false);
@@ -104,7 +98,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   const [aiLoading, setAILoading] = useState(false);
   const [recognizing, setRecognizing] = useState(false);
   const recognitionRef = useRef<any>(null);
-  const { currentStory } = useStoryStore();
+  // const { currentStory } = useStoryStore();
   const [collapsed, setCollapsed] = useState(true); // 默认折叠
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -125,25 +119,15 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
     }
   }, [collapsed, isEditing, role]);
 
-  // 编辑时自动展开
-  const handleEdit = () => {
-    if (collapsed) {
-      setCollapsed(false);
-      setTimeout(() => setIsEditing(true), 200); // 动画后再进入编辑
-    } else {
-      setIsEditing(true);
-    }
-  };
-
   // 删除按钮点击
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isNew) {
-      onDelete && onDelete();
-    } else {
-      setShowDeleteModal(true);
-    }
-  };
+  // const handleDelete = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   if (isNew) {
+  //     onDelete && onDelete();
+  //   } else {
+  //     setShowDeleteModal(true);
+  //   }
+  // };
 
   // 确认删除
   const confirmDelete = async () => {
@@ -169,7 +153,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   };
   // 判断是否有修改
   const isModified = () => {
-    return Object.keys(form).some(key => form[key] !== role[key]);
+    return Object.keys(form).some(key => form[key as keyof RoleType] !== role[key as keyof RoleType]);
   };
   // 保存
   const handleSave = async () => {
@@ -249,7 +233,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
     recognition.continuous = true; // 持续识别
     recognition.interimResults = true; // 实时
     recognition.onstart = () => setRecognizing(true);
-    recognition.onerror = (e: any) => {
+    recognition.onerror = () => {
       setError("语音识别失败，请重试");
       setRecognizing(false);
     };
@@ -274,12 +258,12 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   };
 
   return (
-    <div className="bg-[#f6f8fa] rounded-2xl p-4 px-6 shadow-sm relative transition-all duration-300" style={{ minHeight: collapsed ? 56 : undefined }}>
-      <div className="flex items-center">
+    <div className="bg-[#f6f8fa] rounded-2xl p-4 px-6 shadow-sm ">
+      <div className="flex items-center mb-3">
         <Avatar className="w-8 h-8 mr-2">
           <AvatarImage src="/avatars/user.jpg" />
         </Avatar>
-        <span className="font-bold text-base cursor-pointer select-none" onClick={() => setCollapsed(v => !v)}>{role.name || "未命名"}</span>
+        <span className="font-bold text-base">{role.name || "未命名"}</span>
         <div className="ml-auto flex gap-2 items-center">
           {/* AI生成按钮仅编辑时显示 */}
           {isEditing && (
@@ -299,7 +283,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
             </Button>
           )}
           {!isEditing ? (
-            <Edit className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={handleEdit} />
+            <Edit className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={() => setIsEditing(true)} />
           ) : (
             <span
               className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0CB994] ml-1 cursor-pointer"
@@ -312,12 +296,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
               )}
             </span>
           )}
-          <Trash2 className="w-4 h-4 cursor-pointer text-red-500 hover:text-red-600" onClick={handleDelete} />
-          {collapsed ? (
-            <ChevronUp className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={() => setCollapsed(false)} />
-          ) : (
-            <ChevronDown className="w-4 h-4 cursor-pointer text-gray-400 hover:text-[#22b07d]" onClick={() => setCollapsed(true)} />
-          )}
+          <Trash2 className="w-4 h-4 cursor-pointer text-red-500 hover:text-red-600" onClick={onDelete} />
         </div>
       </div>
       {/* AI生成弹出卡片内容 */}
@@ -435,7 +414,6 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
 
 export default function GenerationPage() {
   const { currentStory } = useStoryStore();
-  const genId = () => Date.now().toString() + Math.random().toString(36).slice(2, 8);
   const [mainRoles, setMainRoles] = useState<any[]>([]);
   const [subRoles, setSubRoles] = useState<any[]>([]);
   const [mainEditingIdx, setMainEditingIdx] = useState<number | null>(null);
@@ -488,27 +466,15 @@ export default function GenerationPage() {
   const mainIsNew = mainRoles.map(role => role.isNew || !role.id);
   const subIsNew = subRoles.map(role => role.isNew || !role.id);
 
-  const updateRole = (type: "main" | "sub", idx: number, key: keyof RoleType, value: string) => {
-    const setter = type === "main" ? setMainRoles : setSubRoles;
-    const roles = type === "main" ? [...mainRoles] : [...subRoles];
-    roles[idx][key] = value;
-    setter(roles);
-  };
-
-  // 模拟接口调用
-  const saveRole = async (role: RoleType) => {
-    return new Promise<void>(resolve => setTimeout(resolve, 800));
-  };
-
-  const handleForceExpand = (type: "main" | "sub", idx: number) => {
-    if (type === "main") {
-      setMainAllCollapsed(false);
-      setMainEditingIdx(idx);
-    } else {
-      setSubAllCollapsed(false);
-      setSubEditingIdx(idx);
-    }
-  };
+  // const handleForceExpand = (type: "main" | "sub", idx: number) => {
+  //   if (type === "main") {
+  //     setMainAllCollapsed(false);
+  //     setMainEditingIdx(idx);
+  //   } else {
+  //     setSubAllCollapsed(false);
+  //     setSubEditingIdx(idx);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -567,9 +533,6 @@ export default function GenerationPage() {
                     key={role.id || idx}
                     role={role}
                     onChange={() => {}}
-                    onSave={async () => {}}
-                    isEditingDefault={mainEditingIdx === idx}
-                    isNew={mainIsNew[idx]}
                     onDelete={() => {
                       if (mainIsNew[idx]) {
                         deleteRole("main", idx);
@@ -580,16 +543,6 @@ export default function GenerationPage() {
                     }}
                     onDeleteConfirm={() => deleteRole("main", idx)}
                     forceCollapsed={mainAllCollapsed !== null ? mainAllCollapsed : (mainExpandIdx === idx ? false : undefined)}
-                    onForceExpand={() => {}}
-                    // 新增：折叠时的回调
-                    onCollapse={() => {
-                      if (mainEditingIdx === idx) {
-                        setMainEditingIdx(null);
-                        setMainExpandIdx(null);
-                      } else {
-                        setMainExpandIdx(null);
-                      }
-                    }}
                   />
                 ))}
               </div>
@@ -612,9 +565,6 @@ export default function GenerationPage() {
                     key={role.id || idx}
                     role={role}
                     onChange={() => {}}
-                    onSave={async () => {}}
-                    isEditingDefault={subEditingIdx === idx}
-                    isNew={subIsNew[idx]}
                     onDelete={() => {
                       if (subIsNew[idx]) {
                         deleteRole("sub", idx);
@@ -625,16 +575,6 @@ export default function GenerationPage() {
                     }}
                     onDeleteConfirm={() => deleteRole("sub", idx)}
                     forceCollapsed={subAllCollapsed !== null ? subAllCollapsed : (subExpandIdx === idx ? false : undefined)}
-                    onForceExpand={() => {}}
-                    // 新增：折叠时的回调
-                    onCollapse={() => {
-                      if (subEditingIdx === idx) {
-                        setSubEditingIdx(null);
-                        setSubExpandIdx(null);
-                      } else {
-                        setSubExpandIdx(null);
-                      }
-                    }}
                   />
                 ))}
               </div>

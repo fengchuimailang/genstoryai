@@ -9,15 +9,17 @@ from contextlib import asynccontextmanager
 from genstoryai_backend.config import print_env_vars
 
 from genstoryai_backend.utils.middleware import add_middlewares
-from genstoryai_backend.database.db import create_db_and_tables
+from genstoryai_backend.database.db import create_db_and_tables,init_db_with_default_data
 from genstoryai_backend.router import story_router
 from genstoryai_backend.router import character_router
 from genstoryai_backend.router import user_router
 from genstoryai_backend.router import health_router
+from genstoryai_backend.router import story_content_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
+    init_db_with_default_data()
     yield
 
 app = FastAPI(title="GenStoryAI API", lifespan=lifespan)
@@ -38,6 +40,7 @@ app.include_router(health_router, prefix="/api")
 app.include_router(character_router, prefix="/api")
 app.include_router(story_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+app.include_router(story_content_router, prefix="/api")
 
 # 挂载静态文件 - 在API路由之后
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")

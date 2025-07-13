@@ -42,31 +42,29 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            sed -i 's|^ *- OPENAI_API_KEY=.*|- OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}|' docker-compose.yml &&
-            sed -i 's|^ *- OPENAI_BASE_URL=.*|- OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}|' docker-compose.yml &&
-            sed -i 's|^ *- OPENAI_MODEL=.*|- OPENAI_MODEL=${{ secrets.OPENAI_MODEL }}|' docker-compose.yml &&
-            sed -i 's|^ *- DATABASE_URL=.*|- DATABASE_URL=${{ secrets.DATABASE_URL }}|' docker-compose.yml &&
-            sed -i 's|^ *- SECRET_KEY=.*|- SECRET_KEY=${{ secrets.SECRET_KEY }}|' docker-compose.yml &&
-            sed -i 's|^ *- ALGORITHM=.*|- ALGORITHM=${{ secrets.ALGORITHM }}|' docker-compose.yml &&
-            sed -i 's|^ *- ACCESS_TOKEN_EXPIRE_MINUTES=.*|- ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}|' docker-compose.yml &&
-            sed -i 's|^ *- SMTP_SERVER=.*|- SMTP_SERVER=${{ secrets.SMTP_SERVER }}|' docker-compose.yml &&
-            sed -i 's|^ *- SMTP_PORT=.*|- SMTP_PORT=${{ secrets.SMTP_PORT }}|' docker-compose.yml &&
-            sed -i 's|^ *- SMTP_USERNAME=.*|- SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}|' docker-compose.yml &&
-            sed -i 's|^ *- SMTP_PASSWORD=.*|- SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}|' docker-compose.yml &&
-            sed -i 's|^ *- MAIL_SIMULATE=.*|- MAIL_SIMULATE=${{ secrets.MAIL_SIMULATE }}|' docker-compose.yml &&
-            sed -i 's|^ *- SMTP_EMAIL_FROM_NAME=.*|- SMTP_EMAIL_FROM_NAME=${{ secrets.SMTP_EMAIL_FROM_NAME }}|' docker-compose.yml &&
-            sed -i 's|^ *- SMTP_EMAIL_FROM_ADDRESS=.*|- SMTP_EMAIL_FROM_ADDRESS=${{ secrets.SMTP_EMAIL_FROM_ADDRESS }}|' docker-compose.yml &&
-            sed -i 's|^ *- FRONTEND_URL=.*|- FRONTEND_URL=${{ secrets.FRONTEND_URL }}|' docker-compose.yml
+            sed -i 's|^ *- OPENAI_API_KEY=.*|      - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}|' docker-compose.yml &&
+            sed -i 's|^ *- OPENAI_BASE_URL=.*|      - OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}|' docker-compose.yml &&
+            sed -i 's|^ *- OPENAI_MODEL=.*|      - OPENAI_MODEL=${{ secrets.OPENAI_MODEL }}|' docker-compose.yml &&
+            sed -i 's|^ *- DATABASE_URL=.*|      - DATABASE_URL=${{ secrets.DATABASE_URL }}|' docker-compose.yml &&
+            sed -i 's|^ *- SECRET_KEY=.*|      - SECRET_KEY=${{ secrets.SECRET_KEY }}|' docker-compose.yml &&
+            sed -i 's|^ *- ALGORITHM=.*|      - ALGORITHM=${{ secrets.ALGORITHM }}|' docker-compose.yml &&
+            sed -i 's|^ *- ACCESS_TOKEN_EXPIRE_MINUTES=.*|      - ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_SERVER=.*|      - SMTP_SERVER=${{ secrets.SMTP_SERVER }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_PORT=.*|      - SMTP_PORT=${{ secrets.SMTP_PORT }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_USERNAME=.*|      - SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_PASSWORD=.*|      - SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}|' docker-compose.yml &&
+            sed -i 's|^ *- MAIL_SIMULATE=.*|      - MAIL_SIMULATE=${{ secrets.MAIL_SIMULATE }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_EMAIL_FROM_NAME=.*|      - SMTP_EMAIL_FROM_NAME=${{ secrets.SMTP_EMAIL_FROM_NAME }}|' docker-compose.yml &&
+            sed -i 's|^ *- SMTP_EMAIL_FROM_ADDRESS=.*|      - SMTP_EMAIL_FROM_ADDRESS=${{ secrets.SMTP_EMAIL_FROM_ADDRESS }}|' docker-compose.yml &&
+            sed -i 's|^ *- FRONTEND_URL=.*|      - FRONTEND_URL=${{ secrets.FRONTEND_URL }}|' docker-compose.yml
           "
 
       - name: Build and deploy on server (with backup)
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            docker image tag genstoryai-app:latest genstoryai-app:last-success || true &&
-            docker build -t genstoryai-app:latest . &&
-            docker stop genstoryai-app || true && docker rm genstoryai-app || true &&
-            docker run -d --name genstoryai-app -p 80:80 genstoryai-app:latest
+            docker-compose down --rmi all || true &&
+            docker-compose up -d --build
           "
 
       - name: Healthcheck Backend
@@ -78,12 +76,12 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "curl -fsSL --max-time 10 $HEALTHCHECK_FRONTEND"
 
-      - name: Rollback on failure
-        if: failure()
-        run: |
-          echo "Healthcheck failed, rolling back..."
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
-            cd ${{ secrets.SERVER_PROJECT_PATH }} &&
-            docker stop genstoryai-app || true && docker rm genstoryai-app || true &&
-            docker run -d --name genstoryai-app -p 80:80 genstoryai-app:last-success
-          " 
+      # - name: Rollback on failure
+      #   if: failure()
+      #   run: |
+      #     echo "Healthcheck failed, rolling back..."
+      #     ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+      #       cd ${{ secrets.SERVER_PROJECT_PATH }} &&
+      #       docker-compose down || true &&
+      #       docker-compose up -d
+      #     " 

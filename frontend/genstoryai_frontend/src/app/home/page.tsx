@@ -1,250 +1,139 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
-import { 
-  BookOpen, 
-  Clock, 
-  TrendingUp, 
-  Plus, 
-  FileText, 
-  Settings, 
-  Calendar,
-  Star
-} from 'lucide-react';
-import { GenStorySidebar } from '../../components/genstory-sidebar';
-import { SidebarInset, SidebarProvider } from '../../components/ui/sidebar';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { FileText, Star, MoreVertical, Grid, List, Search, Bell } from "lucide-react";
+import { useState } from "react";
+
+const stats = [
+  { value: "5", unit: "天", label: "制作天数", highlight: true },
+  { value: "1.8", unit: "万", label: "总字数" },
+  { value: "18", unit: "天", label: "作品数" },
+  { value: "5", unit: "天", label: "rectangle" },
+];
+
+const works = [
+  { name: "午夜拉面里的秘密", time: "2025-01-01 18:23" },
+  { name: "当最后一颗番茄落在生锈的铁门上时", time: "2025-01-01 18:23" },
+  { name: "穿过第七个青萝才能抵达的遗忘之城", time: "2025-01-01 18:23" },
+];
 
 export default function HomePage() {
-  const navigate = useNavigate();
-
-  // 模拟数据 - 在实际应用中这些数据应该从API获取
-  const stats = [
-    {
-      title: "总故事数",
-      value: "12",
-      description: "已创建的故事",
-      icon: BookOpen,
-      trend: "+2 本月",
-      color: "text-blue-600"
-    },
-    {
-      title: "创作时间",
-      value: "48h",
-      description: "累计创作时间",
-      icon: Clock,
-      trend: "+12h 本周",
-      color: "text-green-600"
-    },
-    {
-      title: "完成度",
-      value: "85%",
-      description: "故事完成率",
-      icon: TrendingUp,
-      trend: "+5% 本月",
-      color: "text-purple-600"
-    }
-  ];
-
-  const recentActivities = [
-    {
-      title: "《魔法森林的冒险》",
-      description: "更新了第3章",
-      time: "2小时前",
-      type: "update"
-    },
-    {
-      title: "《星际旅行》",
-      description: "创建了新故事",
-      time: "昨天",
-      type: "create"
-    },
-    {
-      title: "《古代传说》",
-      description: "完成了第5章",
-      time: "3天前",
-      type: "complete"
-    }
-  ];
-
-  const quickActions = [
-    {
-      title: "创建新故事",
-      description: "开始一个新的创作",
-      icon: Plus,
-      action: () => navigate('/create-story'),
-      color: "bg-blue-500 hover:bg-blue-600"
-    },
-    {
-      title: "我的故事",
-      description: "查看所有故事",
-      icon: FileText,
-      action: () => navigate('/stories'),
-      color: "bg-green-500 hover:bg-green-600"
-    },
-    {
-      title: "设置",
-      description: "账户和偏好设置",
-      icon: Settings,
-      action: () => navigate('/settings'),
-      color: "bg-gray-500 hover:bg-gray-600"
-    }
-  ];
+  const [view, setView] = useState<"list" | "grid">("list");
+  const [search, setSearch] = useState("");
 
   return (
-    <SidebarProvider
-      style={{
-        "--sidebar-width": "calc(var(--spacing) * 72)",
-        "--header-height": "calc(var(--spacing) * 12)",
-      } as React.CSSProperties}
-    >
-      <GenStorySidebar variant="inset" />
-      <SidebarInset>
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              {/* 页面标题 */}
-              <div className="flex items-center justify-between space-y-2 px-4 lg:px-6">
-                <h2 className="text-3xl font-bold tracking-tight">仪表板</h2>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-500">
-                    {new Date().toLocaleDateString('zh-CN', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </span>
+    <div className="min-h-screen bg-[#f6f8fa]">
+      {/* 顶部欢迎区 */}
+      <div className="flex justify-between items-center px-10 pt-8 pb-2">
+        <div>
+          <h1 className="text-3xl font-bold">
+            Hi，欢迎来到 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffb800] to-[#ff7a00]">GenstoryAI!</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Bell className="w-5 h-5" />
+          </Button>
+          <Avatar>
+            <AvatarImage src="/avatars/user.jpg" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+        </div>
+      </div>
+
+      {/* 创作看板 */}
+      <div className="px-10 mt-2">
+        <h2 className="text-lg font-semibold mb-4">创作看板</h2>
+        <div className="grid grid-cols-4 gap-4">
+          {stats.map((stat, i) => (
+            <Card key={i} className="rounded-xl shadow-none border border-[#f0f0f0] bg-white">
+              <CardContent className="flex flex-col items-center justify-center py-6">
+                <div className={`text-3xl font-extrabold ${stat.highlight ? "text-[#2196f3]" : "text-gray-900"}`}>
+                  {stat.value}
+                  <span className="text-base font-normal ml-1">{stat.unit}</span>
                 </div>
+                <div className="text-gray-400 text-sm mt-1">{stat.label}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* 大的“开始创作”按钮卡片 */}
+        <Card className="rounded-xl mt-6 bg-[#22b07d] border-none shadow-none">
+          <CardContent className="flex items-center justify-center py-12">
+            <Button size="lg" className="bg-transparent text-white text-2xl font-bold hover:bg-[#1a8c63] flex items-center gap-2">
+              <span className="text-3xl">+</span> 开始创作
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 我的作品 */}
+      <div className="px-10 mt-10">
+        <Card className="rounded-xl border-none shadow-none bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-lg font-bold">我的作品</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative w-40">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="搜索"
+                  className="w-full h-8 text-sm bg-[#f6f8fa] border border-[#e5e7eb] rounded-md pl-8"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
               </div>
-
-              {/* Stats Cards */}
-              <div className="grid gap-4 px-4 md:grid-cols-2 lg:grid-cols-3 lg:px-6">
-                {stats.map((stat, index) => (
-                  <Card key={index} className="hover:shadow-md transition-shadow">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-600">
-                        {stat.title}
-                      </CardTitle>
-                      <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">{stat.value}</div>
-                      <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
-                      <Badge variant="secondary" className="mt-2 text-xs">
-                        {stat.trend}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              <div className="grid gap-4 px-4 md:grid-cols-2 lg:grid-cols-7 lg:px-6">
-                {/* Quick Actions */}
-                <Card className="col-span-4">
-                  <CardHeader>
-                    <CardTitle>快速操作</CardTitle>
-                    <CardDescription>
-                      开始您的创作之旅
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {quickActions.map((action, index) => (
-                        <Button
-                          key={index}
-                          onClick={action.action}
-                          className={`h-auto p-4 flex flex-col items-center gap-2 text-white ${action.color} transition-colors`}
-                        >
-                          <action.icon className="h-6 w-6" />
-                          <div className="text-center">
-                            <div className="font-medium">{action.title}</div>
-                            <div className="text-xs opacity-90">{action.description}</div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Recent Activities */}
-                <Card className="col-span-3">
-                  <CardHeader>
-                    <CardTitle>最近活动</CardTitle>
-                    <CardDescription>
-                      您的最新创作动态
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {recentActivities.map((activity, index) => (
-                        <div key={index} className="flex items-start space-x-3">
-                          <div className="mt-1">
-                            {activity.type === 'create' && (
-                              <div className="h-2 w-2 rounded-full bg-green-500" />
-                            )}
-                            {activity.type === 'update' && (
-                              <div className="h-2 w-2 rounded-full bg-blue-500" />
-                            )}
-                            {activity.type === 'complete' && (
-                              <div className="h-2 w-2 rounded-full bg-purple-500" />
-                            )}
-                          </div>
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium leading-none">
-                              {activity.title}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {activity.description}
-                            </p>
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {activity.time}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Featured Story */}
-              <Card className="mx-4 lg:mx-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-yellow-500" />
-                    推荐故事
-                  </CardTitle>
-                  <CardDescription>
-                    基于您的阅读偏好推荐
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center space-x-4">
-                    <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                      <BookOpen className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">《魔法森林的冒险》</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        一个关于勇气和友谊的奇幻故事，讲述了一个小女孩在魔法森林中的冒险经历...
-                      </p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <Badge variant="outline">奇幻</Badge>
-                        <Badge variant="outline">冒险</Badge>
-                        <span className="text-xs text-gray-400">3章 • 2小时前更新</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      继续阅读
+              <Button
+                variant={view === "list" ? "secondary" : "ghost"}
+                size="icon"
+                className="rounded-md"
+                onClick={() => setView("list")}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={view === "grid" ? "secondary" : "ghost"}
+                size="icon"
+                className="rounded-md"
+                onClick={() => setView("grid")}
+              >
+                <Grid className="w-4 h-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <Separator />
+          <CardContent className="pt-4">
+            <div className="flex font-semibold text-gray-500 text-sm mb-2">
+              <div className="flex-1">作品名称</div>
+              <div className="w-48 text-center">最近编辑时间</div>
+              <div className="w-32 text-center">操作</div>
+            </div>
+            {works
+              .filter(w => w.name.includes(search))
+              .map((work, i) => (
+                <div key={i} className="flex items-center py-2 hover:bg-gray-50 rounded-lg group">
+                  <div className="flex-1 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-[#22b07d]" />
+                    <span className="text-gray-900">{work.name}</span>
+                  </div>
+                  <div className="w-48 text-center text-gray-400 text-sm">{work.time}</div>
+                  <div className="w-32 flex items-center justify-center gap-2">
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <Star className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <MoreVertical className="w-4 h-4" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+                </div>
+              ))}
+          </CardContent>
+        </Card>
+      </div>
+      <div className="h-10" />
+    </div>
   );
 }

@@ -1,33 +1,39 @@
-from pydantic import BaseModel
-from typing import List
-from . import CommonBase
+from typing import List, Optional, TYPE_CHECKING
+from genstoryai_backend.models import CommonBase
 from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
 
-class TimelineBase(CommonBase, BaseModel):
-    name: str
-    start_time: datetime
-    end_time: datetime
-    description: str | None = None
+if TYPE_CHECKING:
+    from genstoryai_backend.models.story import Story
+    from genstoryai_backend.models.event import Event
 
-class Timeline(TimelineBase):
-    id: int
-    events: List[int] = []
+class TimelineBase(SQLModel):
+    name: str = Field(description="时间线名称")
+    description: Optional[str] = Field(description="时间线描述", default=None)
+    start_time: Optional[datetime] = Field(description="时间线开始时间", default=None)
+    end_time: Optional[datetime] = Field(description="时间线结束时间", default=None)
+
+class Timeline(TimelineBase,CommonBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    
+    # 关联到故事（一对一）
+    story_id: int = Field(foreign_key="story.id", unique=True)
+    story: "Story" = Relationship(back_populates="timeline")
+    
+    # 关联到事件（一对多）
+    events: List["Event"] = Relationship(back_populates="timeline")
 
 class TimelineCreate(TimelineBase):
-    pass
+    story_id: int = Field(description="所属故事的ID")
 
 class TimelineRead(TimelineBase):
     id: int
+    story_id: int
+    event_count: int = 0  # 事件数量
 
-    class Config:
-        orm_mode = True
-
-class TimelineUpdate(CommonBase, BaseModel):
-    name: str | None = None
-    start_time: datetime | None = None
-    end_time: datetime | None = None
-    description: str | None = None
-    events: List[int] | None = None
-
-    class Config:
-        orm_mode = True
+class TimelineUpdate(SQLModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    story_id: Optional[int] = None

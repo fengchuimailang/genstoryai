@@ -5,14 +5,14 @@ from genstoryai_backend.models.story import Story, StoryCreate, StoryUpdate
 
 
 def create_story(db: Session, story: StoryCreate) -> Story:
-    db_story = Story(**story.dict())
+    db_story = Story(**story.model_dump(exclude_unset=True))
     db.add(db_story)
     db.commit()
     db.refresh(db_story)
     return db_story
 
 
-def get_story(db: Session, story_id: int) -> Story:
+def get_story(db: Session, story_id: int) -> Optional[Story]:
     db_story = db.exec(select(Story).where(Story.id == story_id)).first()
     if db_story is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Story not found")

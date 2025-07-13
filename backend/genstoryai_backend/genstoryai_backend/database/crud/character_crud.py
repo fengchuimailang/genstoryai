@@ -5,7 +5,8 @@ from genstoryai_backend.models.character import Character, CharacterCreate, Char
 
 
 def create_character(db: Session, character: CharacterCreate) -> Character:
-    db_character = Character.from_orm(character)
+    # 使用 model_validate 创建 Character 对象
+    db_character = Character.model_validate(character)
     db.add(db_character)
     db.commit()
     db.refresh(db_character)
@@ -18,7 +19,12 @@ def get_character(db: Session, character_id: int) -> Character:
     return db_character
 
 def get_characters(db: Session, skip: int = 0, limit: int = 100) -> List[Character]:
-    return db.exec(select(Character).offset(skip).limit(limit)).all()
+    characters = db.exec(select(Character).offset(skip).limit(limit)).all()
+    return list(characters)
+
+def get_characters_by_story_id(db: Session, story_id: int) -> List[Character]:
+    characters = db.exec(select(Character).where(Character.story_id == story_id)).all()
+    return list(characters)
 
 
 def update_character(db: Session, character_id: int, character: CharacterUpdate) -> Character:
