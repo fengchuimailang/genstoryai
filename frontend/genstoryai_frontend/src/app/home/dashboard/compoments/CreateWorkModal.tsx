@@ -19,18 +19,19 @@ const tags = ["都市脑洞", "乡村", "校园", "末世", "民国", "未来"];
 
 export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalProps) {
   // 在组件内补全所有表单字段state
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
+  const [title, setTitle] = useState('霸道仲裁爱上我');
+  const [author, setAuthor] = useState(null);
   const [language, setLanguage] = useState('zh');
   const [genre, setGenre] = useState('fantasy');
+  const [Tags, setTags] = useState(['标签']);
   const [summary, setSummary] = useState('');
-  const [outline, setOutline] = useState('');
-  const [version_time, setVersionTime] = useState('');
-  const [version_text, setVersionText] = useState('');
+  const [outline, setOutline] = useState(null);
+  const [version_time, setVersionTime] = useState(null);
+  const [version_text, setVersionText] = useState(null);
   const [story_template_id, setStoryTemplateId] = useState(0);
-  const [ssf, setSsf] = useState('');
+  const [ssf, setSsf] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
   const userId = useAuthStore(state => state.user?.id || 0);
   const navigate = useNavigate();
   const setCurrentStory = useStoryStore(state => state.setCurrentStory);
@@ -59,7 +60,7 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
       };
       const result = await createStory(storyData);
       setCurrentStory(result);
-      navigate('/story/' + result.id);
+      navigate('/generation');
     } catch (e) {
       setError('创建失败');
     } finally {
@@ -110,8 +111,8 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
                     key={t}
                     variant="outline"
                     size="sm"
-                    className={`h-10 px-4 rounded-lg border-none text-base ${genre.includes(t) ? "!bg-[#EFFDFA] !text-[#00AD88]" : "!bg-[#F5F5F5] !text-[#666]"}`}
-                    onClick={() => setGenre(genre.includes(t) ? genre.filter(i => i !== t) : [...genre, t])}
+                    className={`h-10 px-4 rounded-lg border-none text-base ${Tags.includes(t) ? "!bg-[#EFFDFA] !text-[#00AD88]" : "!bg-[#F5F5F5] !text-[#666]"}`}
+                    onClick={() => setTags(Tags.includes(t) ? Tags.filter(i => i !== t) : [...Tags, t])}
                   >
                     {t}
                   </Button>

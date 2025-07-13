@@ -156,4 +156,11 @@ export interface Story {
   create_time?: string;
   update_time?: string;
   is_deleted?: boolean;
-} 
+}
+
+export const GENDER_MAP = {
+  male: '男',
+  female: '女',
+  other: '其他',
+} as const;
+export type Gender = keyof typeof GENDER_MAP; 
