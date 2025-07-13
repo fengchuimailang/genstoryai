@@ -5,7 +5,7 @@ from sqlmodel import Session
 from genstoryai_backend.database.db import get_db
 from genstoryai_backend.models.character import CharacterCreate,CharacterRead,CharacterUpdate
 from genstoryai_backend.database.crud import create_character, get_character, get_characters, update_character, delete_character
-from genstoryai_backend.agents.character_agent import generate_character
+from genstoryai_backend.agents import UnifiedAgent
 from genstoryai_backend.database.crud import get_story
 
 character_router = APIRouter(
@@ -20,7 +20,12 @@ async def generate_character_endpoint(user_prompt: str = Query(None), story_id: 
     story = get_story(db, story_id)
     if story is None:
         raise HTTPException(status_code=404, detail="Story not found")
-    return await generate_character(user_prompt, story)
+    
+    # 使用统一代理
+    agent = UnifiedAgent(db_session=db)
+    import uuid
+    session_id = uuid.uuid4()  # 这里应该从请求中获取真实的 session_id
+    return await agent.generate_character(session_id, user_prompt, story)
 
 @character_router.post("/create/",response_model=CharacterRead)
 async def create_character_endpoint(character: CharacterCreate, db: Session = Depends(get_db)):

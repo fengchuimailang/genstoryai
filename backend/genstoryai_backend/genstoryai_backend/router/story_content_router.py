@@ -5,7 +5,7 @@ from genstoryai_backend.database.crud.character_crud import get_characters_by_st
 from genstoryai_backend.database.db import get_db
 from genstoryai_backend.models.story_content import StoryContentCreate, StoryContentRead, StoryContentUpdate
 from genstoryai_backend.database.crud import create_story_content, get_story_content, get_story_contents, update_story_content, delete_story_content
-from genstoryai_backend.agents.story_content_agent import generate_story_content
+from genstoryai_backend.agents import UnifiedAgent
 from genstoryai_backend.database.crud.story_crud import get_story
 from genstoryai_backend.models.character import CharacterRead
 
@@ -24,7 +24,12 @@ async def generate_story_content_endpoint(story_id: int, outline_title: str = Qu
     
     characters = get_characters_by_story_id(db, story_id)
     characterReads = [CharacterRead.model_validate(character) for character in characters]
-    result = await generate_story_content(story,characterReads, outline_title)
+    
+    # 使用统一代理
+    agent = UnifiedAgent(db_session=db)
+    import uuid
+    session_id = uuid.uuid4()  # 这里应该从请求中获取真实的 session_id
+    result = await agent.generate_story_content(session_id, story, characterReads, outline_title)
     if result is None:
         raise HTTPException(status_code=500, detail="Failed to generate story content")
     return result

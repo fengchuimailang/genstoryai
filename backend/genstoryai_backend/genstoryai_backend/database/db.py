@@ -16,6 +16,8 @@ from genstoryai_backend.models.enum.mbti import MBTI
 from genstoryai_backend.models.enum.language import Language
 from genstoryai_backend.models.enum.location_type import LocationType
 from genstoryai_backend.models.location import Location
+# 导入新的会话相关模型
+from genstoryai_backend.models.session import Session as SessionModel, SessionMessage, Tool, ToolUsage
 
 # 创建 SQLite 数据库引擎
 SQLALCHEMY_DATABASE_URL = "sqlite:///./genstoryai.db"

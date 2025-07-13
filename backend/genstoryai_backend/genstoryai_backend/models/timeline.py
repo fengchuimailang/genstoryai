@@ -1,5 +1,5 @@
 from typing import List, Optional, TYPE_CHECKING
-from . import CommonBase
+from genstoryai_backend.models import CommonBase
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 
