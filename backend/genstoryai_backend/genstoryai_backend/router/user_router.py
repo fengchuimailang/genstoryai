@@ -11,15 +11,15 @@ from email.mime.multipart import MIMEMultipart
 import logging
 from sqlalchemy import select
 
-from ..models.user import UserCreate, UserRead, UserLogin, UserUpdate
-from ..database.db import get_db
-from ..database.crud import (
+from genstoryai_backend.models.user import UserCreate, UserRead, UserLogin, UserUpdate
+from genstoryai_backend.database.db import get_db
+from genstoryai_backend.database.crud import (
     create_user, get_user_by_email, login_user,
     get_users, update_user, delete_user, verify_user_email
 )
-from ..config import settings
-from ..utils.email_templates import get_verification_email_content
-from ..database.crud import set_user_verification_token
+from genstoryai_backend.config import settings
+from genstoryai_backend.utils.email_templates import get_verification_email_content
+from genstoryai_backend.database.crud import set_user_verification_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
