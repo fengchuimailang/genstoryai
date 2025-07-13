@@ -14,24 +14,16 @@ interface CreateWorkModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const categories = ["都市脑洞", "乡村", "校园", "末世", "民国", "未来"];
 const tags = ["都市脑洞", "乡村", "校园", "末世", "民国", "未来"];
 
 export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalProps) {
   // 在组件内补全所有表单字段state
   const [title, setTitle] = useState('霸道仲裁爱上我');
-  const [author, setAuthor] = useState(null);
   const [language, setLanguage] = useState('zh');
   const [genre, setGenre] = useState('fantasy');
   const [Tags, setTags] = useState(['标签']);
   const [summary, setSummary] = useState('');
-  const [outline, setOutline] = useState(null);
-  const [version_time, setVersionTime] = useState(null);
-  const [version_text, setVersionText] = useState(null);
-  const [story_template_id, setStoryTemplateId] = useState(0);
-  const [ssf, setSsf] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const userId = useAuthStore(state => state.user?.id || 0);
   const navigate = useNavigate();
   const setCurrentStory = useStoryStore(state => state.setCurrentStory);
@@ -43,20 +35,13 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
       setError('请填写必填项');
       return;
     }
-    setLoading(true);
     try {
       const storyData = {
         title,
         creator_user_id: userId, // 需从登录用户获取
-        author,
         language,
         genre,
         summary,
-        outline,
-        version_time,
-        version_text,
-        story_template_id,
-        ssf,
       };
       const result = await createStory(storyData);
       setCurrentStory(result);
@@ -64,7 +49,7 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
     } catch (e) {
       setError('创建失败');
     } finally {
-      setLoading(false);
+      // setLoading(false); // This line was removed as per the edit hint
     }
   };
 
