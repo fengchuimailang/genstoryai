@@ -3,6 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { StoryGenre, Language } from '@/types';
+import { createStory } from '@/api/story-api';
+import { useStoryStore } from '@/lib/store';
+import { useAuthStore } from '@/lib/store';
 // import "./CreateWorkModal.css";
 
 interface CreateWorkModalProps {
@@ -14,39 +18,53 @@ const categories = ["都市脑洞", "乡村", "校园", "末世", "民国", "未
 const tags = ["都市脑洞", "乡村", "校园", "末世", "民国", "未来"];
 
 export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalProps) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<string[]>([]);
-  const [tag, setTag] = useState<string[]>([]);
-  const [catalog, setCatalog] = useState("no");
-  const [desc, setDesc] = useState("");
-  const [error, setError] = useState("");
+  // 在组件内补全所有表单字段state
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [language, setLanguage] = useState('zh');
+  const [genre, setGenre] = useState('fantasy');
+  const [summary, setSummary] = useState('');
+  const [outline, setOutline] = useState('');
+  const [version_time, setVersionTime] = useState('');
+  const [version_text, setVersionText] = useState('');
+  const [story_template_id, setStoryTemplateId] = useState(0);
+  const [ssf, setSsf] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const userId = useAuthStore(state => state.user?.id || 0);
   const navigate = useNavigate();
+  const setCurrentStory = useStoryStore(state => state.setCurrentStory);
+
   // 下一步按钮点击事件
-  const handleNext = () => {
-    if (!name.trim()) {
-      setError("请填写作品名称");
+  const handleNext = async () => {
+    // 简单校验
+    if (!title || !genre || !language) {
+      setError('请填写必填项');
       return;
     }
-    if (category.length === 0) {
-      setError("请选择作品分类");
-      return;
+    setLoading(true);
+    try {
+      const storyData = {
+        title,
+        creator_user_id: userId, // 需从登录用户获取
+        author,
+        language,
+        genre,
+        summary,
+        outline,
+        version_time,
+        version_text,
+        story_template_id,
+        ssf,
+      };
+      const result = await createStory(storyData);
+      setCurrentStory(result);
+      navigate('/story/' + result.id);
+    } catch (e) {
+      setError('创建失败');
+    } finally {
+      setLoading(false);
     }
-    if (tag.length === 0) {
-      setError("请选择作品标签");
-      return;
-    }
-    if (!catalog) {
-      setError("请选择目录选项");
-      return;
-    }
-    if (!desc.trim()) {
-      setError("请填写作品简介");
-      return;
-    }
-    setError(""); // 清空错误
-    // 通过校验，执行后续逻辑
-    navigate("/generation");
-    console.log("校验通过，提交数据");
   };
 
   return (
@@ -64,21 +82,21 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
             {/* 作品名称 */}
             <div className="flex items-center">
               <div className="w-24 text-base font-bold text-left text-[#222]">作品名称</div>
-              <Input className="flex-1 h-10 text-base" placeholder="请输入作品名称" value={name} onChange={e => setName(e.target.value)} />
+              <Input className="flex-1 h-10 text-base" placeholder="请输入作品名称" value={title} onChange={e => setTitle(e.target.value)} />
             </div>
             {/* 作品分类 */}
-            <div className="flex items-center">
+            <div className="flex items-start">
               <div className="w-24 text-base font-bold text-left text-[#222]">作品分类</div>
               <div className="flex flex-wrap gap-2 flex-1">
-                {categories.map(c => (
+                {Object.entries(StoryGenre).map(([key, label])=> (
                   <Button
-                    key={c}
+                    key={key}
                     variant="outline"
                     size="sm"
-                    className={`h-10 px-4 rounded-lg border-none text-base ${category.includes(c) ? "!bg-[#EFFDFA] !text-[#00AD88]" : "!bg-[#F5F5F5] !text-[#666]"}`}
-                    onClick={() => setCategory(category.includes(c) ? category.filter(i => i !== c) : [...category, c])}
+                    className={`h-10 px-4 rounded-lg border-none text-base ${genre === key ? "!bg-[#EFFDFA] !text-[#00AD88]" : "!bg-[#F5F5F5] !text-[#666]"}`}
+                    onClick={() => setGenre(key)}
                   >
-                    {c}
+                    {label}
                   </Button>
                 ))}
               </div>
@@ -92,8 +110,8 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
                     key={t}
                     variant="outline"
                     size="sm"
-                    className={`h-10 px-4 rounded-lg border-none text-base ${tag.includes(t) ? "!bg-[#EFFDFA] !text-[#00AD88]" : "!bg-[#F5F5F5] !text-[#666]"}`}
-                    onClick={() => setTag(tag.includes(t) ? tag.filter(i => i !== t) : [...tag, t])}
+                    className={`h-10 px-4 rounded-lg border-none text-base ${genre.includes(t) ? "!bg-[#EFFDFA] !text-[#00AD88]" : "!bg-[#F5F5F5] !text-[#666]"}`}
+                    onClick={() => setGenre(genre.includes(t) ? genre.filter(i => i !== t) : [...genre, t])}
                   >
                     {t}
                   </Button>
@@ -102,26 +120,20 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
             </div>
             {/* 选择目录 */}
             <div className="flex items-center">
-              <div className="w-24 text-base font-bold text-left text-[#222]">选择目录</div>
+              <div className="w-24 text-base font-bold text-left text-[#222]">选择语言</div>
               <div className="flex gap-6 flex-1">
-                <label className="flex items-center gap-1 cursor-pointer text-base font-normal h-10">
-                  <input type="radio" checked={catalog === "no"} onChange={() => setCatalog("no")} className="accent-[#00AD88] w-4 h-4"/>
-                  不需要目录
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer text-base font-normal h-10">
-                  <input type="radio" checked={catalog === "need"} onChange={() => setCatalog("need")} className="accent-[#00AD88] w-4 h-4"/>
-                  需要章
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer text-base font-normal h-10">
-                  <input type="radio" checked={catalog === "need_section"} onChange={() => setCatalog("need_section")} className="accent-[#00AD88] w-4 h-4"/>
-                  需要章和节
-                </label>
+                {Object.entries(Language).map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-1 cursor-pointer text-base font-normal h-10">
+                    <input type="radio" checked={language === key} onChange={() => setLanguage(key)} className="accent-[#00AD88] w-4 h-4" />
+                    {label as string}
+                  </label>
+                ))}
               </div>
             </div>
             {/* 作品简介 */}
             <div className="flex items-center">
               <div className="w-24 text-base font-bold text-left text-[#222]">作品简介</div>
-              <textarea className="flex-1 h-20 border rounded-lg p-2 text-base resize-none bg-[#F5F5F5]" placeholder="认真填写更有机会生成的效果更好哦~" value={desc} onChange={e => setDesc(e.target.value)} />
+              <textarea className="flex-1 h-20 border rounded-lg p-2 text-base resize-none bg-[#F5F5F5]" placeholder="认真填写更有机会生成的效果更好哦~" value={summary} onChange={e => setSummary(e.target.value)} />
             </div>
             {/* 下一步按钮 */}
             <div className="flex justify-center mt-4">

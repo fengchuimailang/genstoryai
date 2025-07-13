@@ -119,4 +119,41 @@ export interface AppConstants {
   SUPPORTED_LANGUAGES: Language[];
   TOKEN_KEY: string;
   USER_KEY: string;
+}
+
+export enum StoryGenre {
+  fantasy = '奇幻',
+  science_fiction = '科幻',
+  mystery = '悬疑',
+  romance = '浪漫爱情',
+  thriller = '惊悚',
+  horror = '恐怖',
+  adventure = '冒险',
+  historical = '历史',
+  contemporary = '现代',
+}
+
+export enum Language {
+  zh = '中文',
+  en = '英文',
+  ja = '日文',
+  ko = '韩文',
+}
+
+export interface Story {
+  title: string;
+  creator_user_id: number;
+  author: string;
+  language: string;
+  genre: string;
+  summary: string;
+  outline: string;
+  version_time: string;
+  version_text: string;
+  story_template_id: number;
+  ssf: string;
+  id?: number;
+  create_time?: string;
+  update_time?: string;
+  is_deleted?: boolean;
 } 

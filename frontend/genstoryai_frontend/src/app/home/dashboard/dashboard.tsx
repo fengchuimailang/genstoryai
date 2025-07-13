@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 // import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Star, MoreVertical, Grid, List, Search, Bell } from "lucide-react";
-import { useState } from "react";
+import { FileText, Star, MoreVertical, Grid, List, Search, Bell, Trash2, Edit, Eye } from "lucide-react";
+import { useState, useEffect } from "react";
 import CreateWorkModal from "./compoments/CreateWorkModal";
+import { getStoryList } from '@/api/story-api';
 const stats = [
   { value: "5", unit: "天", label: "制作天数", highlight: true },
   { value: "1.8", unit: "万", label: "总字数" },
@@ -24,6 +25,51 @@ export default function HomePage() {
   const [view, setView] = useState<"list" | "grid">("list");
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [stories, setStories] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+
+  // 获取故事列表
+  const fetchStories = async (params?: { page?: number; search?: string }) => {
+    setLoading(true);
+    try {
+      const skip = ((params?.page ?? page) - 1) * pageSize;
+      const limit = pageSize;
+      const res = await getStoryList({ skip, limit, search: params?.search ?? search });
+      if (Array.isArray(res)) {
+        setStories(res);
+        setTotal(res.length < pageSize ? skip + res.length : skip + pageSize + 1);
+      } else {
+        setStories(res.data || []);
+        setTotal(res.total || 0);
+      }
+    } catch (e) {
+      setStories([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStories({ page: 1 });
+    // eslint-disable-next-line
+  }, []);
+
+  // 分页切换
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    fetchStories({ page: newPage });
+  };
+
+  // 搜索
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1);
+    fetchStories({ page: 1, search: e.target.value });
+  };
   return (
     <div className="min-h-screen bg-[#f6f8fa]">
       {/* 顶部欢迎区 */}
@@ -33,15 +79,6 @@ export default function HomePage() {
             Hi，欢迎来到 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffb800] to-[#ff7a00]">GenstoryAI!</span>
           </h1>
         </div>
-        {/* <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Bell className="w-5 h-5" />
-          </Button>
-          <Avatar>
-            <AvatarImage src="/avatars/user.jpg" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-        </div> */}
       </div>
 
       {/* 创作看板 */}
@@ -70,7 +107,7 @@ export default function HomePage() {
         </Card>
       </div>
 
-      {/* 我的作品 */}
+      {/* 我的作品（渲染 stories） */}
       <div className="px-10 mt-10">
         <Card className="rounded-xl border-none shadow-none bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -82,7 +119,7 @@ export default function HomePage() {
                 placeholder="搜索"
                 className="w-40 h-8 text-sm bg-[#f6f8fa] border border-[#e5e7eb] rounded-md"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={handleSearch}
               />
               <Button
                 variant={view === "list" ? "secondary" : "ghost"}
@@ -106,28 +143,35 @@ export default function HomePage() {
           <CardContent className="pt-4">
             <div className="flex font-semibold text-gray-500 text-sm mb-2">
               <div className="flex-1">作品名称</div>
-              <div className="w-48 text-center">最近编辑时间</div>
+              <div className="w-100 text-center">最近编辑时间</div>
               <div className="w-32 text-center">操作</div>
             </div>
-            {works
-              .filter(w => w.name.includes(search))
-              .map((work, i) => (
-                <div key={i} className="flex items-center py-2 hover:bg-gray-50 rounded-lg group">
+            {loading ? (
+              <div className="text-center py-8 text-gray-400">加载中...</div>
+            ) : stories.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">暂无数据</div>
+            ) : (
+              stories.map((story, i) => (
+                <div key={story.id || i} className="flex items-center py-2 hover:bg-gray-50 rounded-lg group">
                   <div className="flex-1 flex items-center gap-2">
                     <FileText className="w-5 h-5 text-[#22b07d]" />
-                    <span className="text-gray-900">{work.name}</span>
+                    <span className="text-gray-900">{story.title}</span>
                   </div>
-                  <div className="w-48 text-center text-gray-400 text-sm">{work.time}</div>
+                  <div className="w-100 text-center text-gray-400 text-sm">{story.version_time}</div>
                   <div className="w-32 flex items-center justify-center gap-2">
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                      <Star className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
+                    <button className="text-gray-400 hover:text-red-500" title="删除"><Trash2 className="w-4 h-4" /></button>
+                    <button className="text-gray-400 hover:text-blue-500" title="编辑"><Edit className="w-4 h-4" /></button>
+                    <button className="text-gray-400 hover:text-green-500" title="查看"><Eye className="w-4 h-4" /></button>
                   </div>
                 </div>
-              ))}
+              ))
+            )}
+            {/* 分页 */}
+            <div className="flex justify-center mt-4 gap-2">
+              <Button size="sm" variant="outline" disabled={page === 1} onClick={() => handlePageChange(page - 1)}>上一页</Button>
+              <span className="px-2 text-gray-500">第 {page} 页</span>
+              <Button size="sm" variant="outline" disabled={stories.length < pageSize} onClick={() => handlePageChange(page + 1)}>下一页</Button>
+            </div>
           </CardContent>
         </Card>
       </div>
