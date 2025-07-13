@@ -34,7 +34,6 @@ export default function HomePage() {
       const res = await getStoryList({ skip, limit, search: params?.search ?? search });
       if (Array.isArray(res)) {
         setStories(res);
-        setTotal(res.length < pageSize ? skip + res.length : skip + pageSize + 1);
       } else {
         setStories(res.data || []);
         setTotal(res.total || 0);
@@ -42,7 +41,6 @@ export default function HomePage() {
       }
     } catch (e) {
       setStories([]);
-      setTotal(0);
     } finally {
       setLoading(false);
     }

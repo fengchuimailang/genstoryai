@@ -1,4 +1,4 @@
-import type { AppConstants, Language } from '@/types';
+import type { AppConstants } from '@/types';
 
 export const APP_CONSTANTS: AppConstants = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:80',
@@ -78,9 +78,9 @@ export const SUCCESS_MESSAGES = {
   PROFILE_UPDATED: '个人信息更新成功',
 } as const;
 
-export const LANGUAGES: Record<Language, { name: string; nativeName: string; flag: string }> = {
+export const LANGUAGES: Record<string, { name: string; nativeName: string; flag: string }> = {
   zh: { name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
   en: { name: 'English', nativeName: 'English', flag: '🇺🇸' },
   ja: { name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
   ko: { name: 'Korean', nativeName: '한국어', flag: '🇰🇷' },
-} as const; 
+}; 
