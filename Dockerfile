@@ -12,7 +12,7 @@ RUN npm install -g pnpm
 COPY frontend/genstoryai_frontend/package.json frontend/genstoryai_frontend/pnpm-lock.yaml ./
 
 # 安装前端依赖
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # 复制前端源代码
 COPY frontend/genstoryai_frontend/ ./
