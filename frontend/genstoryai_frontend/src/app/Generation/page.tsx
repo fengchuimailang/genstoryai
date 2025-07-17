@@ -8,6 +8,8 @@ import { useStoryStore } from '@/lib/store';
 import axios from 'axios';
 import { GENDER_MAP } from '@/types';
 import type { Gender } from '@/types';
+import { generateOutline, getCharacterList, updateCharacter, deleteCharacter } from '@/api/story-api';
+import '@/Bookloding.css';
 const initialRole = {
   id: '',
   name: '',
@@ -149,7 +151,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
   const confirmDelete = async () => {
     setLoading(true);
     try {
-      await axios.delete(`/api/character/${role.id}`, { data: { character_id: role.id } });
+      await deleteCharacter(role.id);
       setShowDeleteModal(false);
       onDeleteConfirm && onDeleteConfirm(); // 父组件移除卡片
     } catch (e) {
@@ -181,7 +183,7 @@ function RoleCardOptimized({ role, onChange, onSave, onDelete, isEditingDefault 
     }
     setLoading(true);
     try {
-      await axios.put(`/api/character/${role.id}`, {
+      await updateCharacter(role.id, {
         name: form.name,
         is_main: form.is_main,
         gender: form.gender,
@@ -444,15 +446,21 @@ export default function GenerationPage() {
   const [subAllCollapsed, setSubAllCollapsed] = useState<boolean | null>(true);
   const [mainExpandIdx, setMainExpandIdx] = useState<number | null>(null);
   const [subExpandIdx, setSubExpandIdx] = useState<number | null>(null);
+  const [outlines, setOutlines] = useState<{title: string, content: string}[]>([]);
+  const [loadingOutline, setLoadingOutline] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [showBook, setShowBook] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const lastCardRef = useRef<HTMLDivElement>(null);
 
+  // 1. 获取角色列表
   useEffect(() => {
-    // 请求人物信息
-    axios.get('/api/character/', { params: { skip: 0, limit: 9999 } })
-      .then(res => {
-        const data = res.data || [];
-        setMainRoles(data.filter((item: any) => item.is_main));
-        setSubRoles(data.filter((item: any) => !item.is_main));
-      });
+    getCharacterList({ skip: 0, limit: 9999 }).then(data => {
+      setMainRoles(data.filter((item: any) => item.is_main));
+      setSubRoles(data.filter((item: any) => !item.is_main));
+    });
   }, []);
 
   // 添加新卡片并自动进入编辑状态，插入到第一个
@@ -508,6 +516,37 @@ export default function GenerationPage() {
       setSubAllCollapsed(false);
       setSubEditingIdx(idx);
     }
+  };
+
+  const handleGenerateOutline = async () => {
+    if (!currentStory?.id) return;
+    setLoadingOutline(true);
+    setShowBook(true)
+    try {
+      const res = await generateOutline(currentStory.id, 1);
+      setOutlines(res.outline || []);
+    } catch (e) {
+      // setError("生成大纲失败，请重试");
+      setShowBook(false)
+    } finally {
+      setLoadingOutline(false);
+    }
+  };
+
+  const handleAddSection = () => {
+    setOutlines(prev => {
+      const newOutlines = [...prev, { title: '', content: '' }];
+      setTimeout(() => {
+        setEditingIndex(newOutlines.length - 1);
+        setEditTitle('');
+        setEditContent('');
+        // 滚动到新卡片
+        if (lastCardRef.current) {
+          lastCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }, 0);
+      return newOutlines;
+    });
   };
 
   return (
@@ -647,11 +686,152 @@ export default function GenerationPage() {
               background: 'linear-gradient(90deg, #2E6CF6 0%, #8F6AF6 100%)',
               zIndex: 10,
             }}
+            onClick={handleGenerateOutline}
+            disabled={loadingOutline}
           >
-            ✨ 生成故事章节
+            {loadingOutline ? '生成中...' : '✨ 生成故事章节'}
           </button>
         </div>
-        <div className="flex-1" />
+        <div className="flex-1 flex flex-col items-center justify-center">
+  { !showBook ? (
+    <>
+      <div className="w-80 h-60 flex flex-col items-center justify-center opacity-60 bg-gray-100 rounded-xl border border-dashed border-gray-300">
+        <svg width="48" height="48" fill="none" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#e5e7eb"/><path d="M16 32h16M24 16v16" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round"/></svg>
+        <div className="text-gray-400 mt-2">暂无内容</div>
+      </div>
+    </>
+  ) : null}
+  { showBook  && (
+    <div className="w-full max-w-2xl flex flex-col items-center">
+      <div className="flex items-center text-gray-600 text-base mb-4 w-full text-left">
+        根据您填写的内容，为您生成大纲如下！
+        {loadingOutline && (
+          <svg className="animate-spin ml-2 w-5 h-5 text-blue-400" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+          </svg>
+        )}
+      </div>
+      <div className="w-full flex-1 flex flex-col items-center justify-center" style={{ minHeight: 550, maxHeight: 550 }}>
+        {loadingOutline ? (
+          <div className="loader">
+          <div>
+            <ul>
+              <li>
+                <svg viewBox="0 0 90 120" fill="currentColor">
+                  <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                </svg>
+              </li>
+              <li>
+                <svg viewBox="0 0 90 120" fill="currentColor">
+                  <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                </svg>
+              </li>
+              <li>
+                <svg viewBox="0 0 90 120" fill="currentColor">
+                  <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                </svg>
+              </li>
+              <li>
+                <svg viewBox="0 0 90 120" fill="currentColor">
+                  <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                </svg>
+              </li>
+              <li>
+                <svg viewBox="0 0 90 120" fill="currentColor">
+                  <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                </svg>
+              </li>
+              <li>
+                <svg viewBox="0 0 90 120" fill="currentColor">
+                  <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                </svg>
+              </li>
+            </ul>
+          </div><span>Loading</span>
+        </div>
+        ) : (
+          <div className="w-full space-y-4 overflow-y-auto" style={{ maxHeight: 550, minHeight: 550 }} ref={listRef}>
+            {outlines.map((item, idx) => (
+              <div
+                key={idx}
+                ref={idx === outlines.length - 1 ? lastCardRef : undefined}
+                className="bg-white rounded-xl shadow p-4 border border-blue-200 relative group"
+                // 移除 onMouseLeave 事件，避免鼠标移出时退出编辑
+              >
+                {/* 右上角编辑/删除按钮，仅hover时显示 */}
+                <div className="absolute top-3 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                  <Edit
+                    className="w-4 h-4 text-gray-400 cursor-pointer hover:text-blue-500"
+                    onClick={() => {
+                      setEditingIndex(idx);
+                      setEditTitle(item.title);
+                      setEditContent(item.content);
+                    }}
+                  />
+                  <Trash2 className="w-4 h-4 text-red-500 cursor-pointer hover:text-red-600" />
+                </div>
+                {editingIndex === idx ? (
+                  <>
+                    <input
+                      className="font-bold mb-2 w-full border-b border-gray-200 focus:outline-none focus:border-blue-400 text-base"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                    />
+                    <textarea
+                      className="w-full mt-2 border rounded p-2 text-gray-700 focus:outline-none focus:border-blue-400"
+                      rows={4}
+                      value={editContent}
+                      onChange={e => setEditContent(e.target.value)}
+                    />
+                    <div className="flex gap-2 mt-2 justify-end">
+                      <button
+                        className="px-4 py-1 rounded bg-green-500 text-white"
+                        onClick={() => {
+                          const newOutlines = outlines.slice();
+                          newOutlines[idx] = { title: editTitle, content: editContent };
+                          setOutlines(newOutlines);
+                          setEditingIndex(null);
+                        }}
+                      >保存</button>
+                      <button
+                        className="px-4 py-1 rounded bg-gray-200 text-gray-700"
+                        onClick={() => setEditingIndex(null)}
+                      >取消</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="font-bold mb-2">第{idx + 1}章：{item.title}</div>
+                    <div className="text-gray-700 whitespace-pre-line">{item.content}</div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* 章节下方按钮 */}
+      <button
+        className="w-full max-w-2xl border border-green-400 text-green-500 rounded-full py-2 mt-8 flex items-center justify-center hover:bg-green-50"
+        style={{ background: 'white' }}
+        onClick={handleAddSection}
+      >
+        <span className="text-lg mr-2">＋</span> 添加章节
+      </button>
+      <button
+        className="mt-4 px-8 py-2 rounded-full text-white font-bold text-base"
+        style={{
+          background: 'linear-gradient(90deg, #22b07d 0%, #3ad6a5 100%)',
+          zIndex: 10,
+        }}
+        disabled
+      >
+        ✨ 生成故事正文
+      </button>
+    </div>
+  )}
+</div>
       </div>
     </div>
   );
