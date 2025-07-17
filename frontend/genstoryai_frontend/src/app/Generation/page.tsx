@@ -462,7 +462,7 @@ function RoleCardOptimized({
               <LabeledInput
                 key={key}
                 label={labelMap[key]}
-                value={role[key]}
+                value={form[key]}
                 onChange={e => setForm({ ...form, [key]: e.target.value })}
                 required
                 readOnly={!isEditing}
@@ -473,7 +473,7 @@ function RoleCardOptimized({
           <div className='col-span-2'>
             <LabeledInput
               label={labelMap.character}
-              value={role.character}
+              value={form.character}
               onChange={e => setForm({ ...form, character: e.target.value })}
               required
               readOnly={!isEditing}
@@ -482,7 +482,7 @@ function RoleCardOptimized({
           <div className='col-span-2'>
             <LabeledInput
               label={labelMap.background}
-              value={role.background}
+              value={form.background}
               onChange={e => setForm({ ...form, background: e.target.value })}
               required
               readOnly={!isEditing}
@@ -502,7 +502,7 @@ function RoleCardOptimized({
             <LabeledInput
               key={key}
               label={labelMap[key]}
-              value={role[key]}
+              value={form[key]}
               onChange={e => setForm({ ...form, [key]: e.target.value })}
               required
               readOnly={!isEditing}
@@ -705,7 +705,7 @@ export default function GenerationPage() {
             <div className='font-bold text-lg text-[#222] leading-tight'>
               {currentStory?.title || '未命名故事'}
             </div>
-            <div className='flex items-center mt-1 gap-2'>
+            {/* <div className='flex items-center mt-1 gap-2'>
               <span className='bg-[#F3F4F6] text-gray-500 text-xs rounded-lg px-3 py-1'>
                 第一人称
               </span>
@@ -713,7 +713,7 @@ export default function GenerationPage() {
                 女频
               </span>
               <span className='text-gray-400 text-xs ml-2'>字数统计:0</span>
-            </div>
+            </div> */}
           </div>
         </div>
         {/* 右侧通知和头像 */}
@@ -772,7 +772,12 @@ export default function GenerationPage() {
                   <RoleCardOptimized
                     key={role.id || idx}
                     role={role}
-                    onChange={() => {}}
+                    onChange={(key, value) => {
+                      const updated = { ...role, [key]: value };
+                      const newRoles = [...mainRoles];
+                      newRoles[idx] = updated;
+                      setMainRoles(newRoles);
+                    }}
                     onSave={async () => {}}
                     isEditingDefault={mainEditingIdx === idx}
                     isNew={mainIsNew[idx]}
@@ -835,7 +840,12 @@ export default function GenerationPage() {
                   <RoleCardOptimized
                     key={role.id || idx}
                     role={role}
-                    onChange={() => {}}
+                    onChange={(key, value) => {
+                      const updated = { ...role, [key]: value };
+                      const newRoles = [...subRoles];
+                      newRoles[idx] = updated;
+                      setSubRoles(newRoles);
+                    }}
                     onSave={async () => {}}
                     isEditingDefault={subEditingIdx === idx}
                     isNew={subIsNew[idx]}
@@ -934,6 +944,11 @@ export default function GenerationPage() {
                   <div className='loader'>
                     <div>
                       <ul>
+                        <li>
+                          <svg viewBox='0 0 90 120' fill='currentColor'>
+                            <path d='M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z'></path>
+                          </svg>
+                        </li>
                         <li>
                           <svg viewBox='0 0 90 120' fill='currentColor'>
                             <path d='M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z'></path>
