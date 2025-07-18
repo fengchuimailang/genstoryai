@@ -42,6 +42,9 @@ export default function CreateWorkModal({ open, onOpenChange }: CreateWorkModalP
         language,
         genre,
         summary,
+        author:'',
+        version_text:'',
+        story_template_id:0
       };
       const result = await createStory(storyData);
       setCurrentStory(result);
