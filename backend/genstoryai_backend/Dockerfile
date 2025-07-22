@@ -18,10 +18,14 @@ RUN apt-get update && apt-get install -y \
 # 创建非root用户
 RUN useradd --create-home --shell /bin/bash app
 
-# 复制 Poetry 配置文件并安装依赖
-COPY pyproject.toml poetry.lock ./
-RUN pip install "poetry==1.7.1"
-RUN poetry install --no-root --only main || (cat /root/.cache/pypoetry/log/* || true; exit 1)
+# 复制 pyproject.toml
+COPY pyproject.toml ./
+
+# 安装 uv
+RUN pip install uv
+
+# 安装依赖
+RUN uv sync
 
 # 复制后端全部代码
 COPY . .
@@ -36,4 +40,4 @@ USER app
 EXPOSE 80
 
 # 启动命令
-CMD ["poetry", "run", "start"] 
+CMD ["python", "genstoryai_backend/main.py"] 
