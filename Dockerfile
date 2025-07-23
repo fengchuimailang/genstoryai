@@ -37,8 +37,13 @@ RUN pip install uv
 COPY backend/genstoryai_backend/uv.lock ./
 RUN uv pip sync uv.lock --system
 
-# 复制后端代码
-COPY backend/genstoryai_backend .
+# 复制后端代码到 /app/genstoryai_backend
+COPY backend/genstoryai_backend /app/genstoryai_backend
+
+WORKDIR /app/genstoryai_backend
+
+# 安装本地包
+RUN pip install .
 
 # 从前端构建阶段复制静态文件
 COPY --from=frontend-builder /app/frontend/dist ./static
