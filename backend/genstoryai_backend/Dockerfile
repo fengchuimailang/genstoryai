@@ -18,14 +18,14 @@ RUN apt-get update && apt-get install -y \
 # 创建非root用户
 RUN useradd --create-home --shell /bin/bash app
 
-# 复制 pyproject.toml
-COPY pyproject.toml ./
+# 复制 uv.lock
+COPY uv.lock ./
 
 # 安装 uv
 RUN pip install uv
 
 # 安装依赖
-RUN uv sync
+RUN uv pip sync uv.lock
 
 # 复制后端全部代码
 COPY . .
