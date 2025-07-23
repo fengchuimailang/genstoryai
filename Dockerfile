@@ -28,14 +28,14 @@ WORKDIR /app
 # 安装系统依赖
 RUN apt-get update && \
     apt-get install -y gcc default-libmysqlclient-dev pkg-config && \
-    pip install "poetry==1.7.1" && \
     rm -rf /var/lib/apt/lists/*
 
-RUN poetry config virtualenvs.in-project true
+# 安装 uv
+RUN pip install uv
 
-# 复制后端依赖文件并安装依赖
-COPY backend/genstoryai_backend/pyproject.toml backend/genstoryai_backend/poetry.lock ./
-RUN poetry install --no-root
+# 复制 uv.lock 并安装依赖
+COPY backend/genstoryai_backend/uv.lock ./
+RUN uv pip sync uv.lock
 
 # 复制后端代码
 COPY backend/genstoryai_backend .
@@ -49,4 +49,4 @@ RUN mkdir -p ./static
 EXPOSE 80
 
 # 启动FastAPI应用
-CMD ["poetry", "run", "start"] 
+CMD ["python", "genstoryai_backend/main.py"] 
