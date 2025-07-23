@@ -25,7 +25,7 @@ COPY uv.lock ./
 RUN pip install uv
 
 # 安装依赖
-RUN uv pip sync uv.lock
+RUN uv pip sync uv.lock --system
 
 # 复制后端全部代码
 COPY . .

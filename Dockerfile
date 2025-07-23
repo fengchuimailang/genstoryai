@@ -35,7 +35,7 @@ RUN pip install uv
 
 # 复制 uv.lock 并安装依赖
 COPY backend/genstoryai_backend/uv.lock ./
-RUN uv pip sync uv.lock
+RUN uv pip sync uv.lock --system
 
 # 复制后端代码
 COPY backend/genstoryai_backend .
