@@ -1,7 +1,9 @@
 from typing import List, Optional
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
+from genstoryai_backend.models.story import StoryUpdate
 from genstoryai_backend.models.story_content import StoryContent, StoryContentCreate, StoryContentUpdate
+from genstoryai_backend.database.crud.story_crud import get_story, update_story
 
 
 def create_story_content(db: Session, story_content: StoryContentCreate) -> StoryContent:
@@ -9,6 +11,15 @@ def create_story_content(db: Session, story_content: StoryContentCreate) -> Stor
     db.add(db_story_content)
     db.commit()
     db.refresh(db_story_content)
+    # update story outline
+    story = get_story(db, story_content.story_id)
+    storyUpdate = StoryUpdate.model_validate(story)
+    for outlineItem in storyUpdate.outline.itemList:
+        if outlineItem.title == story_content.outline_title:
+            outlineItem.id = db_story_content.id
+            break
+    update_story(db, story_content.story_id, storyUpdate)
+
     return db_story_content
 
 

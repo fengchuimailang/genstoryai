@@ -1,3 +1,6 @@
+"""
+Models for timeline entity. Includes relationship to story.
+"""
 from typing import List, Optional, TYPE_CHECKING
 from genstoryai_backend.models import CommonBase
 from datetime import datetime

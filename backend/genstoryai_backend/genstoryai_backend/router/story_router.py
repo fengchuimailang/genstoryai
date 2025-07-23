@@ -50,7 +50,7 @@ def delete_story_endpoint(story_id: int, db: Session = Depends(get_db)):
 
 
 @story_router.post("/generate_outline/", response_model=StoryOutline)
-async def create_story_outline_endpoint(story_id: int, outline_level: int, db: Session = Depends(get_db)):
+async def create_story_outline_endpoint(story_id: int, db: Session = Depends(get_db)):
     """创建故事大纲"""
     story = get_story(db, story_id)
     if story is None:
@@ -62,5 +62,5 @@ async def create_story_outline_endpoint(story_id: int, outline_level: int, db: S
     agent = UnifiedAgent(db_session=db)
     import uuid
     session_id = uuid.uuid4()  # 这里应该从请求中获取真实的 session_id
-    outline = await agent.generate_story_outline(session_id, story, characterReads, outline_level)
+    outline = await agent.generate_story_outline(session_id, story, characterReads)
     return outline

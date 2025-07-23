@@ -49,28 +49,7 @@ def init_db_with_default_data():
                 ssf=None, 
                 author=None, 
                 summary=None, 
-                outline=[
-  {
-    "title": "第一章：英雄的崛起",
-    "content": "介绍李元霸的背景和他在唐朝军队中的地位，展现他的勇猛和忠诚。"
-  },
-  {
-    "title": "第二章：边疆的危机",
-    "content": "唐朝边疆受到外敌入侵，李元霸被派往前线，肩负起保卫国家的重任。"
-  },
-  {
-    "title": "第三章：力挽狂澜",
-    "content": "李元霸在战场上展现出非凡的战斗力，带领军队击退敌人，成为国家的英雄。"
-  },
-  {
-    "title": "第四章：和平的代价",
-    "content": "战争结束后，李元霸反思战争的残酷，决心为国家的长治久安而努力。"
-  },
-  {
-    "title": "第五章：英雄的归宿",
-    "content": "李元霸的晚年生活，他成为年轻一代的榜样，留下不朽的传奇。"
-  }
-], 
+                outline=None, 
                 version_text=None, 
                 story_template_id=None, 
                 language=Language.zh

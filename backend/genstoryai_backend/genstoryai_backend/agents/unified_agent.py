@@ -1,7 +1,7 @@
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
-from genstoryai_backend.models.story import StoryOutline, Story, OneLevelOutline
+from genstoryai_backend.models.story import StoryOutline, Story, OutlineItem
 from genstoryai_backend.models.character import CharacterCreate, CharacterRead
 from genstoryai_backend.models.story_content import StoryContentCreate
 from genstoryai_backend.database.storage_sync import StorageManagerSync
@@ -11,6 +11,8 @@ from genstoryai_backend.database.db import engine
 from typing import List, Optional, Dict, Any, Union
 from uuid import UUID
 import json
+from genstoryai_backend.agents.prompt_templete import OUTLINE_PROMPT, STORY_CONTENT_PROMPT
+from genstoryai_backend.agents.prompt_templete import CHARACTER_CREATION_PROMPT
 
 class UnifiedAgent:
     """Unified agent that manages story generation using Pydantic AI tools"""
@@ -56,7 +58,6 @@ class UnifiedAgent:
             story_title: str,
             story_genre: str,
             story_summary: str,
-            outline_level: int = 1,
             story_language: str = "English",
             characters_json: str = "[]"
         ) -> str:
@@ -67,7 +68,6 @@ class UnifiedAgent:
                 story_title: The title of the story
                 story_genre: The genre of the story
                 story_summary: A brief summary of the story
-                outline_level: Level of detail (1 for basic, 2 for detailed)
                 story_language: The language for the story
                 characters_json: JSON string of character information
             """
@@ -85,18 +85,16 @@ class UnifiedAgent:
                 characters_data = []
             
             # Generate outline using the existing logic
-            from genstoryai_backend.agents.prompt_templete import OUTLINE_PROMPT
             user_prompt = OUTLINE_PROMPT.format(
                 story_title, 
                 story_genre, 
                 story_summary, 
-                outline_level,
                 story_language,
                 json.dumps(characters_data, ensure_ascii=False, indent=2)
             )
             
             self.storage.add_agent_message(session_id, f"Prepared outline data for {story_title}")
-            return f"Ready to generate outline for '{story_title}' ({story_genre} genre, level {outline_level}, language: {story_language}). Summary: {story_summary}. Characters: {len(characters_data)} characters provided."
+            return f"Ready to generate outline for '{story_title}' ({story_genre} genre, language: {story_language}). Summary: {story_summary}. Characters: {len(characters_data)} characters provided."
         
         @self.agent.tool
         async def prepare_content_data(
@@ -135,7 +133,6 @@ class UnifiedAgent:
                 characters_data = []
             
             # Create content using the existing logic
-            from genstoryai_backend.agents.prompt_templete import STORY_CONTENT_PROMPT
             user_prompt = STORY_CONTENT_PROMPT.format(
                 story_title, 
                 story_genre,
@@ -177,7 +174,6 @@ class UnifiedAgent:
             self.storage.add_user_message(session_id, f"Preparing character data for: {user_prompt}")
             
             # Create character using the existing logic
-            from genstoryai_backend.agents.prompt_templete import CHARACTER_CREATION_PROMPT
             formatted_prompt = CHARACTER_CREATION_PROMPT.format(
                 user_prompt, 
                 story_title, 
@@ -227,7 +223,7 @@ class UnifiedAgent:
         
         return response
     
-    async def generate_story_outline(self, session_id: UUID, story: Story, character_reads: List[CharacterRead], outline_level: int = 1) -> Optional[StoryOutline]:
+    async def generate_story_outline(self, session_id: UUID, story: Story, character_reads: List[CharacterRead]) -> Optional[StoryOutline]:
         """Generate story outline using the unified agent"""
         characters_data = [character.model_dump(exclude_unset=True) for character in character_reads]
         characters_json = json.dumps(characters_data, ensure_ascii=False, indent=2)
@@ -235,11 +231,16 @@ class UnifiedAgent:
         context = {
             'story': story.model_dump(),
             'characters': characters_data,
-            'outline_level': outline_level,
             'story_id': story.id
         }
         
-        user_prompt = f"Generate a story outline for '{story.title}' ({story.genre.name if story.genre else 'Unknown'} genre). Summary: {story.summary or 'No summary provided'}. Level: {outline_level}. Language: {story.language}. Please use the prepare_outline_data tool and then return a StoryOutline."
+        user_prompt = OUTLINE_PROMPT.format(
+            story.title,
+            story.genre.name if story.genre else 'Unknown',
+            story.summary or 'No summary provided',
+            story.language,
+            characters_json
+        )
         
         result = await self.run(user_prompt, session_id, context)
         
@@ -250,7 +251,7 @@ class UnifiedAgent:
             # 如果不是结构化输出，返回默认大纲
             print(f"Expected StoryOutline but got: {type(result)}")
             outline_items = [
-                OneLevelOutline(
+                OutlineItem(
                     title=f"Chapter {i+1}",
                     content=f"Generated content for chapter {i+1} of {story.title}"
                 ) for i in range(3)
