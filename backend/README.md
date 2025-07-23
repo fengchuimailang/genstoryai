@@ -11,40 +11,11 @@
 在开始之前，请确保您的系统已经安装了以下软件：
 
 - **Python**: 版本需 >= 3.12, < 4.0。您可以从 [Python 官网](https://www.python.org/downloads/) 下载并安装。
-- **Poetry**: 用于项目依赖管理。您可以参考 [Poetry 官方文档](https://python-poetry.org/docs/#installation)进行安装。
-
-### **国际化工具 (可选)**
-
-如果需要处理项目的国际化（i18n）和本地化（l10n），例如编辑 `.po` 翻译文件，您还需要安装 `gettext` 工具集。
-
-- **Windows**:
-  - 从 [这个网站](https://mlocati.github.io/gettext-iconv-windows/) 下载最新的 `gettext` zip 压缩包。
-  - 解压后，将其中的 `bin` 目录路径添加到系统的 `Path` 环境变量中。
-
-- **Linux (Debian/Ubuntu)**:
+- **uv**: 用于项目依赖管理。您可以参考 [uv 官方文档](https://github.com/astral-sh/uv) 进行安装。
+  安装命令（推荐）：
   ```bash
-  sudo apt-get update && sudo apt-get install -y gettext
+  pip install uv
   ```
-
-- **Linux (Fedora/CentOS/RHEL)**:
-  ```bash
-  sudo dnf install -y gettext
-  # 或者在旧版系统上使用 yum
-  # sudo yum install -y gettext
-  ```
-
-- **macOS**:
-  ```bash
-  brew install gettext
-  ```
-  安装后，Homebrew 可能会提示您需要将 `gettext` 添加到您的 `PATH` 环境变量中，请根据提示执行相应命令，例如：
-  ```bash
-  echo 'export PATH="/opt/homebrew/opt/gettext/bin:$PATH"' >> ~/.zshrc
-  source ~/.zshrc
-  ```
-  *(请根据您使用的 Shell 和 Homebrew 的安装路径自行调整)*
-
----
 
 ### **Windows 安装步骤**
 
@@ -56,9 +27,9 @@
     ```
 
 2.  **安装项目依赖**
-    使用 Poetry 安装所有依赖项。
+    使用 uv 安装所有依赖项。
     ```bash
-    poetry install
+    uv sync
     ```
 
 3.  **配置环境变量**
@@ -71,7 +42,9 @@
 4.  **运行应用**
     在 `backend/genstoryai_backend` 目录下，运行以下命令启动服务：
     ```bash
-    poetry run start
+    # 方式一：直接激活虚拟环境
+    source .venv/bin/activate
+    python genstoryai_backend/main.py
     ```
     服务默认将在 `http://127.0.0.1:80` 启动。
 
@@ -87,9 +60,9 @@
     ```
 
 2.  **安装项目依赖**
-    使用 Poetry 安装所有依赖项。
+    使用 uv 安装所有依赖项。
     ```bash
-    poetry install
+    uv sync
     ```
 
 3.  **配置环境变量**
@@ -102,7 +75,9 @@
 4.  **运行应用**
     在 `backend/genstoryai_backend` 目录下，运行以下命令启动服务：
     ```bash
-    poetry run start
+    # 方式一：直接激活虚拟环境
+    source .venv/bin/activate
+    python genstoryai_backend/main.py
     ```
     服务默认将在 `http://127.0.0.1:80` 启动。
 

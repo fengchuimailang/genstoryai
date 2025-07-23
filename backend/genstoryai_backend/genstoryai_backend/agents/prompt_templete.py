@@ -4,16 +4,15 @@ You are an expert story planner. Please generate a detailed story outline based 
 Title: {0}
 Genre: {1}
 Summary: {2}
-Outline Level: {3}
-Story Language: {4}
+Story Language: {3}
 Characters (in JSON format):
-{5}
+{4}
 
 Requirements:
-- If Outline Level is 1, generate a one-level outline: a list of main chapters or sections, each with a title and a brief summary.
-- If Outline Level is 2, generate a two-level outline: each main chapter should contain a list of sub-sections, each with a title and a brief summary.
+- Generate outline which is a list of OutlineItem. Each OutlineItem should have a title and a content.
+- The title of each OutlineItem should be content-only, without any numbers or indices.
 - Parse the character information from the provided JSON array.
-- The outline should be clear, hierarchical, and suitable for further story development.
+- The outline should be clear and suitable for further story development.
 - Do not write the actual story content, only the outline structure and summaries.
 """
 

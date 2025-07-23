@@ -1,146 +1,90 @@
-from typing import Optional, List, Union, Any, TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship
+"""
+Models for story and related entities. Includes story base, creation, reading, and update schemas.
+- Outline and SSF fields are stored as JSON strings for flexibility.
+- Indexes are added to common query fields for performance.
+- Relationships are defined for ORM navigation.
+"""
+from typing import Optional, List, TYPE_CHECKING
+from sqlmodel import SQLModel, Field, Relationship, JSON
 from genstoryai_backend.models import CommonBase
 from genstoryai_backend.models.enum.genre import Genre
 from genstoryai_backend.models.enum.language import Language
 from genstoryai_backend.ssf.ssf import StorySchemaFormat
-from pydantic import BaseModel, validator, field_validator, computed_field
-import json
+from pydantic import BaseModel
 from datetime import datetime
 
 if TYPE_CHECKING:
     from genstoryai_backend.models.timeline import Timeline
 
 
-class OneLevelOutline(BaseModel):
-    title: str
-    content: str
+class OutlineItem(BaseModel):
+    title: str = Field(description="The title of the outline item")
+    content: str = Field(description="The content of the outline item")
+    story_content_id: Optional[int] = Field(default=None, description="The story content id")
 
-class TwoLevelOutline(BaseModel):
-    title: str
-    content: List[OneLevelOutline]
 
 class StoryOutline(BaseModel):
-    outline: Union[List[OneLevelOutline], List[TwoLevelOutline]]
+    itemList: List[OutlineItem] = Field(description="The outline of the story")
 
 class StoryBase(SQLModel):
     title: str = Field(description="The title of the story")
-    creator_user_id: int = Field(description="The user id of the story")
+    creator_user_id: Optional[int] = Field(description="The user id of the story", index=True)
     author: Optional[str] = Field(description="The author of the story")
-    language: Optional[Language] = Field(description="The language of the story", default=Language.zh)
-    genre: Optional[Genre] = Field(description="The genre of the story")
+    language: Optional[Language] = Field(description="The language of the story", default=Language.zh, index=True)
+    genre: Optional[Genre] = Field(description="The genre of the story", index=True)
     summary: Optional[str] = Field(description="The summary of the story")
-    outline: Optional[str] = Field(description="The outline of the story")
-    version_time: Optional[datetime] = Field(description="The version time of the story", default=datetime.now())
+    outline: Optional[dict] = Field(default=None, sa_type=JSON, description="The outline of the story")
+    version_time: Optional[datetime] = Field(description="The version time of the story", default_factory=datetime.now)
     version_text: Optional[str] = Field(description="The version text of the story")
     story_template_id: Optional[int] = Field(description="The story template id")
-    ssf: Optional[str] = Field(description="SSF format story")
-
-    @property
-    def ssf_obj(self) -> Optional[StorySchemaFormat]:
-        if self.ssf:
-            try:
-                return StorySchemaFormat.from_json(self.ssf)
-            except ValueError as e:
-                # 处理无效 JSON 的情况，例如记录日志或返回 None
-                print(f"Error parsing SSF JSON: {e}")
-                return None
-        return None
-
-    @ssf_obj.setter
-    def ssf_obj(self, value: Optional[StorySchemaFormat]):
-        if value:
-            self.ssf = value.to_json()
-        else:
-            self.ssf = None
+    ssf: Optional[dict] = Field(default=None, sa_type=JSON, description="SSF format story")
 
     @property
     def outline_obj(self) -> Optional[StoryOutline]:
-        if self.outline:
-            try:
-                return StoryOutline.model_validate_json(self.outline)
-            except ValueError as e:
-                print(f"Error parsing outline JSON: {e}")
-                return None
+        if self.outline is not None:
+            return StoryOutline.model_validate(self.outline)
         return None
 
     @outline_obj.setter
     def outline_obj(self, value: Optional[StoryOutline]):
-        if value:
-            self.outline = value.model_dump_json()
+        if value is not None:
+            self.outline = value.model_dump()
         else:
             self.outline = None
 
+    @property
+    def ssf_obj(self) -> Optional[StorySchemaFormat]:
+        if self.ssf is not None:
+            return StorySchemaFormat.model_validate(self.ssf)
+        return None
+
+    @ssf_obj.setter
+    def ssf_obj(self, value: Optional[StorySchemaFormat]):
+        if value is not None:
+            self.ssf = value.model_dump()
+        else:
+            self.ssf = None
+
+
 class Story(StoryBase,CommonBase, table=True):
     id: int = Field(primary_key=True, index=True)
-    
-    # 关联到时间线（一对一）
     timeline: Optional["Timeline"] = Relationship(back_populates="story")
 
 class StoryCreate(StoryBase):
-    outline: Optional[Union[str, list, dict]] = None
-    ssf: Optional[Union[str, list, dict]] = None
-
-    @field_validator("outline", mode="before")
-    @classmethod
-    def outline_to_str(cls, v):
-        if isinstance(v, (dict, list)):
-            return json.dumps(v, ensure_ascii=False)
-        return v
-
-    @field_validator("ssf", mode="before")
-    @classmethod
-    def ssf_to_str(cls, v):
-        if isinstance(v, (dict, list)):
-            return json.dumps(v, ensure_ascii=False)
-        return v
+    pass
 
 class StoryRead(StoryBase):
     id: int
-    outline: Any  # 覆盖父类的 outline 字段
-    ssf: Any  # 覆盖父类的 ssf 字段
-
-    @field_validator("outline", mode="before")
-    @classmethod
-    def parse_outline(cls, v):
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except Exception:
-                return None
-        return v
-
-    @field_validator("ssf", mode="before")
-    @classmethod
-    def parse_ssf(cls, v):
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except Exception:
-                return None
-        return v
+    pass
 
 class StoryUpdate(StoryBase):
     title: Optional[str] = None
+    creator_user_id: Optional[int] = None
     author: Optional[str] = None
     genre: Optional[Genre] = None
     summary: Optional[str] = None
     version_time: Optional[datetime] = None
     version_text: Optional[str] = None
-    outline: Optional[Union[str, list]] = None
+    outline: Optional[StoryOutline] = None
     story_template_id: Optional[int] = None
-    ssf: Optional[str] = None
-
-    @field_validator("outline", mode="before")
-    @classmethod
-    def outline_to_str(cls, v):
-        if isinstance(v, (dict, list)):
-            return json.dumps(v, ensure_ascii=False)
-        return v
-    
-    @field_validator("ssf", mode="before")
-    @classmethod
-    def ssf_to_str(cls, v):
-        if isinstance(v, dict):
-            return json.dumps(v, ensure_ascii=False)
-        return v
+    ssf: Optional[StorySchemaFormat] = None
