@@ -16,7 +16,7 @@ def create_story_content(db: Session, story_content: StoryContentCreate) -> Stor
     storyUpdate = StoryUpdate.model_validate(story)
     for outlineItem in storyUpdate.outline.itemList:
         if outlineItem.title == story_content.outline_title:
-            outlineItem.id = db_story_content.id
+            outlineItem.story_content_id = db_story_content.id
             break
     update_story(db, story_content.story_id, storyUpdate)
 
