@@ -1,10 +1,14 @@
 import { apiClient } from './api-client';
 
 export async function getStoryList({ skip = 0, limit = 10, search = '' }) {
-  const params: { skip: number; limit: number; search?: string } = { skip, limit };
-  if (search) params.search = search;
-  const res = await apiClient.get('/api/story/', { params });
-  return res.data;
+  try {
+    const params: { skip: number; limit: number; search?: string } = { skip, limit };
+    if (search) params.search = search;
+    const res = await apiClient.get('/api/story/', { params });
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
 }
 
 export async function createStory(data: any) {
@@ -56,6 +60,55 @@ export async function deleteCharacter(character_id: string | number) {
  * @param data 故事数据
  */
 export async function updateStory(story_id: string | number, data: any) {
-  const res = await apiClient.put(`/api/story/${story_id}`, data);
-  return res.data;
+  try {
+    const res = await apiClient.put(`/api/story/${story_id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
+} 
+
+export async function getStoryById(story_id: string | number) {
+  try {
+    const res = await apiClient.get(`/api/story/${story_id}`);
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
+} 
+
+export async function deleteStory(story_id: string | number) {
+  try {
+    const res = await apiClient.delete(`/api/story/${story_id}`);
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
+} 
+
+export async function createStoryContent(data: { story_id: number; outline_title: string; content: string }) {
+  try {
+    const res = await apiClient.post('/api/story_content/create/', data);
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
+} 
+
+export async function getStoryContent(story_content_id: string | number) {
+  try {
+    const res = await apiClient.get(`/api/story_content/${story_content_id}`);
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
+} 
+
+export async function updateStoryContent(story_content_id: string | number, data: { outline_title: string; content: string }) {
+  try {
+    const res = await apiClient.put(`/api/story_content/${story_content_id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw e?.response?.data?.detail || e?.response?.data?.message || e.message || e;
+  }
 } 

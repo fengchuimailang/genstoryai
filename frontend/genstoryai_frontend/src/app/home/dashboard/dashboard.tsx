@@ -8,6 +8,10 @@ import { FileText, Grid, List, Trash2, Edit, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import CreateWorkModal from "./compoments/CreateWorkModal";
 import { getStoryList } from '@/api/story-api';
+import { toast } from 'sonner';
+import { deleteStory } from '@/api/story-api';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useNavigate } from 'react-router-dom';
 const stats = [
   { value: "5", unit: "天", label: "制作天数", highlight: true },
   { value: "1.8", unit: "万", label: "总字数" },
@@ -24,6 +28,9 @@ export default function HomePage() {
   const pageSize = 10;
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0); // 保留total, 因为后续有用到
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [storyToDelete, setStoryToDelete] = useState<any>(null);
+  const navigate = useNavigate();
 
   // 获取故事列表
   const fetchStories = async (params?: { page?: number; search?: string }) => {
@@ -62,6 +69,20 @@ export default function HomePage() {
     setSearch(e.target.value);
     setPage(1);
     fetchStories({ page: 1, search: e.target.value });
+  };
+
+  // 删除故事
+  const handleDeleteStory = async () => {
+    if (!storyToDelete) return;
+    try {
+      await deleteStory(storyToDelete.id);
+      toast.success('删除成功');
+      setStories(prev => prev.filter(s => s.id !== storyToDelete.id));
+      setDeleteDialogOpen(false);
+      setStoryToDelete(null);
+    } catch (e) {
+      toast.error('删除失败');
+    }
   };
   return (
     <div className="min-h-screen bg-[#f6f8fa]">
@@ -152,8 +173,8 @@ export default function HomePage() {
                   </div>
                   <div className="w-100 text-center text-gray-400 text-sm">{story.version_time}</div>
                   <div className="w-32 flex items-center justify-center gap-2">
-                    <button className="text-gray-400 hover:text-red-500" title="删除"><Trash2 className="w-4 h-4" /></button>
-                    <button className="text-gray-400 hover:text-blue-500" title="编辑"><Edit className="w-4 h-4" /></button>
+                    <button className="text-gray-400 hover:text-red-500" title="删除" onClick={() => { setStoryToDelete(story); setDeleteDialogOpen(true); }}><Trash2 className="w-4 h-4" /></button>
+                    <button className="text-gray-400 hover:text-blue-500" title="编辑" onClick={() => navigate(`/MainStoryContent?storyId=${story.id}`)}><Edit className="w-4 h-4" /></button>
                     <button className="text-gray-400 hover:text-green-500" title="查看"><Eye className="w-4 h-4" /></button>
                   </div>
                 </div>
@@ -170,6 +191,17 @@ export default function HomePage() {
       </div>
       <div className="h-10" />
       <CreateWorkModal open={modalOpen} onOpenChange={setModalOpen} />
+      {/* 删除确认对话框 */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogTitle>确认删除</DialogTitle>
+          <DialogDescription>确定要删除该故事吗？删除后无法恢复。</DialogDescription>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>取消</Button>
+            <Button className="bg-red-500 text-white" onClick={handleDeleteStory}>确认</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

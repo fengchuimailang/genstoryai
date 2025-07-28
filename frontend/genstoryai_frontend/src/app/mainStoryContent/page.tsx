@@ -31,130 +31,181 @@ import {
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import './gradient-typing.css';
+import { getStoryById, createStoryContent, getStoryContent, updateStoryContent } from '@/api/story-api';
+import { toast } from 'sonner';
+import { useStoryStore } from '../../lib/store';
+import { Loading } from '@/components/ui/loading';
 
 interface Chapter {
   id: number;
   title: string;
   description: string;
   content: string;
+  story_content_id?: number | null;
 }
 
-const defaultChapters: Chapter[] = [
-  {
-    id: 1,
-    title: "第一章 你好",
-    description: "苏晚醒来后失去全部记忆,只对红玫瑰表现出病态恐惧。我让周秘书,",
-    content: "苏晚醒来后发现自己躺在一间陌生的房间里，四周的墙壁都是纯白色的，没有任何装饰。她的头很痛，仿佛被重物击中过一样。她试图回忆自己是谁，但脑海中一片空白，连自己的名字都想不起来。\n\n她环顾四周，发现床头柜上放着一朵红玫瑰，花瓣鲜艳如血。不知道为什么，看到这朵玫瑰，她的心中涌起一阵强烈的恐惧，心跳加速，呼吸变得急促。她想要逃离，但身体却动弹不得。\n\n就在这时，门被推开了，一个穿着白大褂的男人走了进来。他的脸上带着温和的笑容，但苏晚却感到一阵寒意。'你醒了？男人问道，声音听起来很熟悉，但她却想不起在哪里听过。\n\n我是谁？'苏晚问道，声音有些颤抖。\n\n男人走到床边，拿起那朵红玫瑰，在手中把玩着。你叫苏晚，是我的病人。他说道，你因为一场意外失去了记忆，我们正在帮你恢复。undefinedn\n苏晚看着那朵红玫瑰，心中的恐惧越来越强烈。她想要尖叫，但声音却卡在喉咙里。她不知道这种恐惧从何而来，但它确实存在，而且越来越强烈。\n\n'我...我害怕玫瑰。苏晚终于说出了心中的恐惧。\n\n男人愣了一下，然后笑了。这很正常，'他说道，'在治疗过程中，你可能会对一些事物产生恐惧反应。这是大脑在保护你。'\n\n但苏晚知道，这种恐惧不仅仅是治疗反应。她感觉这朵红玫瑰背后隐藏着什么可怕的东西，某种她不愿意想起的记忆。\n\n周秘书，男人对着门外喊道，请把苏小姐的药拿来。'\n\n一个穿着职业装的女人走了进来，手中拿着一个药瓶。她的表情很严肃，眼神中带着一丝同情。苏晚注意到她的胸前别着一朵小小的红玫瑰胸针，这让她更加不安。\n\n'这是你的药，周秘书说道，每天三次，饭后服用。'\n\n苏晚接过药瓶，看着里面的白色药片，心中涌起一阵怀疑。她不知道自己是否应该相信这些人，但现在的她别无选择。\n\n谢谢，她说道，声音很轻。\n\n男人和周秘书离开了房间，留下苏晚一个人。她看着手中的药瓶，又看了看床头柜上的红玫瑰，心中充满了疑问和恐惧。\n\n她不知道自己的过去，不知道这些人是否值得信任，也不知道这朵红玫瑰背后隐藏着什么秘密。但有一点是确定的：她必须找回自己的记忆，即使这意味着要面对那些可怕的真相。\n\n苏晚深吸一口气，将药瓶放在床头柜上，然后闭上眼睛，试图在脑海中寻找任何关于过去的线索。但无论她怎么努力，脑海中仍然是一片空白。\n\n她睁开眼睛，看着窗外的阳光，心中暗暗发誓：无论付出什么代价，她都要找回自己的记忆，揭开红玫瑰背后的秘密。"
-  },
-  {
-    id: 2,
-    title: "第二章 记忆碎片",
-    description: "在医院的第三天，苏晚开始做一些奇怪的梦。梦中总是出现一个穿着血红色斗篷的人影",
-    content: "在医院的第三天，苏晚开始做一些奇怪的梦。梦中总是出现一个穿着血红色斗篷的人影"
-  },
-  {
-    id: 3,
-    title: "第三章 辐射尘埃",
-    description: "周秘书告诉苏晚，她的血液检测显示体内有异常的辐射尘埃含量",
-    content: "周秘书告诉苏晚，她的血液检测显示体内有异常的辐射尘埃含量"
-  },
-  {
-    id: 4,
-    title: "第四章 发光怀表",
-    description: "在病房的抽屉里，苏晚发现了一块会发光的怀表，表盘上刻着奇怪的符号",
-    content: "在病房的抽屉里，苏晚发现了一块会发光的怀表，表盘上刻着奇怪的符号"
-  },
-  {
-    id: 5,
-    title: "第五章 机械士兵",
-    description: "深夜，苏晚听到走廊里传来金属碰撞的声音，她偷偷打开门，看到了令人震惊的一幕",
-    content: "深夜，苏晚听到走廊里传来金属碰撞的声音，她偷偷打开门，看到了令人震惊的一幕"
-  },
-  {
-    id: 6,
-    title: "第一章 你好你好你好你好你好你好",
-    description: "这是一个测试章节，用来验证长标题的显示效果",
-    content: "这是一个测试章节，用来验证长标题的显示效果"
-  }
-];
 
 export default function StoryEditorPage() {
-  const [chapters, setChapters] = useState<Chapter[]>(defaultChapters);
-  const [selectedChapter, setSelectedChapter] = useState<Chapter>(defaultChapters[0]);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [selectedChapter, setSelectedChapter] = useState<Chapter>();
   const [fontSize, setFontSize] = useState("15");
   const [algorithmModel, setAlgorithmModel] = useState("gpt-4");
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isContentLoading, setIsContentLoading] = useState(false);
   const editor = useEditor({
     extensions: [StarterKit],
-    content: selectedChapter.content,
+    content: selectedChapter?.content || '',
     editable: true,
   });
+  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { currentStory } = useStoryStore();
+  // 章节内容缓存，避免重复请求
+  const contentCache = useRef<Record<number, string>>({});
 
+  // 页面加载时获取章节列表
   useEffect(() => {
-    if (editor && selectedChapter.content !== editor.getHTML()) {
-      editor.commands.setContent(selectedChapter.content || '');
+    async function fetchChapters(storyId) {
+      setIsPageLoading(true);
+      const data = await getStoryById(storyId);
+      // 适配后端返回格式，outline为章节数组
+      if (Array.isArray(data.outline.itemList) && data.outline.itemList.length > 0) {
+        const mappedChapters = data.outline.itemList.map((item, idx) => ({
+          id: idx + 1,
+          title: item.title,
+          description: item.content || '',
+          content: '',
+          story_content_id: item.story_content_id ?? null,
+        }));
+        // 如果第一章节有story_content_id，拉取内容
+        if (mappedChapters[0]?.story_content_id) {
+          const contentData = await getStoryContent(mappedChapters[0].story_content_id);
+          mappedChapters[0].content = contentData.content || '';
+          contentCache.current[mappedChapters[0].story_content_id] = contentData.content || '';
+        }
+        setChapters(mappedChapters);
+        setSelectedChapter({ ...mappedChapters[0] });
+        // 新增：首次拉取后立即同步到editor
+        setTimeout(() => {
+          if (editor && mappedChapters[0].content) {
+            editor.commands.setContent(mappedChapters[0].content);
+          }
+        }, 0);
+      }
+      setIsPageLoading(false);
     }
-    // eslint-disable-next-line
-  }, [selectedChapter.id]);
+    if (currentStory?.id) {
+      fetchChapters(currentStory.id);
+    }
+  }, [currentStory?.id]);
+
+  // 切换章节时终止动画并同步内容
+  useEffect(() => {
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    async function fetchChapterContent() {
+      if (selectedChapter?.story_content_id) {
+        // 优先用缓存
+        const cached = contentCache.current[selectedChapter.story_content_id];
+        if (cached !== undefined) {
+          setSelectedChapter(prev => prev ? { ...prev, content: cached } : prev);
+          editor?.commands.setContent(cached);
+          setIsContentLoading(false);
+        } else if (selectedChapter?.content === '') {
+          setIsContentLoading(true);
+          try {
+            const contentData = await getStoryContent(selectedChapter.story_content_id);
+            contentCache.current[selectedChapter.story_content_id] = contentData.content || '';
+            setSelectedChapter(prev => prev ? { ...prev, content: contentData.content || '' } : prev);
+            editor?.commands.setContent(contentData.content || '');
+          } catch (e: any) {
+            toast.error(typeof e === 'string' ? e : e?.message || '章节内容加载失败');
+          } finally {
+            setIsContentLoading(false);
+          }
+        }
+      } else if (editor && selectedChapter) {
+        editor.commands.setContent(selectedChapter.content || '');
+        setIsContentLoading(false);
+      }
+      setIsGenerating(false);
+    }
+    fetchChapterContent();
+  }, [selectedChapter?.id]);
 
   // 打字机逐字显示正文
   const streamContent = async (story_id: number, outline_title: string, content: string) => {
     setIsGenerating(true);
+    setIsContentLoading(true);
     editor?.commands.setContent('');
     let accumulated = '';
-    const response = await fetch(`/api/story_content/generate/${story_id}?outline_title=${outline_title}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ story_id, outline_title, content }),
-    });
-    if (!response.body) return;
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    let buffer = '';
-    let fullContent = '';
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      if (value) {
-        buffer += decoder.decode(value);
-        // 尝试解析JSON（流式场景下可能分段）
-        let json = null;
-        try {
-          json = JSON.parse(buffer);
-        } catch (e) {
-          continue;
-        }
-        if (json && typeof json.content === 'string') {
-          fullContent = json.content;
+    try {
+      const response = await fetch(`/api/story_content/generate/${story_id}?outline_title=${outline_title}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ story_id, outline_title, content }),
+      });
+      if (!response.body) throw new Error('无响应数据');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let buffer = '';
+      let fullContent = '';
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        if (value) {
+          buffer += decoder.decode(value);
+          let json = null;
+          try {
+            json = JSON.parse(buffer);
+          } catch (e) {
+            continue;
+          }
+          if (json && typeof json.content === 'string') {
+            fullContent = json.content;
+          }
         }
       }
-    }
-    // 打字机逐字显示
-    const highlightCount = 5;
-    if (fullContent) {
-      let i = 0;
-      const interval = setInterval(() => {
-        accumulated += fullContent[i];
-        // 计算高亮区
-        const start = Math.max(0, accumulated.length - highlightCount);
-        const before = accumulated.slice(0, start);
-        const highlight = accumulated.slice(start);
-        // 用 span 包裹高亮区
-        const html = `${before}<span className="gradient-typing">${highlight}</span>`;
-        editor?.commands.setContent(html, { emitUpdate: false });
-        i++;
-        if (i >= fullContent.length) {
-          clearInterval(interval);
-          setIsGenerating(false);
-          // 最后全部普通色
-          editor?.commands.setContent(fullContent);
-        }
-      }, 30);
-    } else {
+      const highlightCount = 5;
+      if (fullContent) {
+        let i = 0;
+        typingIntervalRef.current && clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = setInterval(() => {
+          accumulated += fullContent[i];
+          const start = Math.max(0, accumulated.length - highlightCount);
+          const before = accumulated.slice(0, start);
+          const highlight = accumulated.slice(start);
+          const html = `${before}<span class="gradient-typing">${highlight}</span>`;
+          editor?.commands.setContent(html, { emitUpdate: false });
+          i++;
+          if (i >= fullContent.length) {
+            typingIntervalRef.current && clearInterval(typingIntervalRef.current);
+            typingIntervalRef.current = null;
+            setIsGenerating(false);
+            editor?.commands.setContent(fullContent);
+            setChapters(prev => prev.map(chap => chap.id === story_id ? { ...chap, content: fullContent } : chap));
+            setSelectedChapter(prev => prev && prev.id === story_id ? { ...prev, content: fullContent } : prev);
+            // 缓存生成内容
+            if (selectedChapter?.story_content_id) {
+              contentCache.current[selectedChapter.story_content_id] = fullContent;
+            }
+            setIsContentLoading(false);
+          }
+        }, 30);
+      } else {
+        setIsGenerating(false);
+        setIsContentLoading(false);
+      }
+    } catch (e: any) {
+      toast.error(typeof e === 'string' ? e : e?.message || '生成正文失败');
       setIsGenerating(false);
+      setIsContentLoading(false);
     }
   };
 
@@ -179,11 +230,11 @@ export default function StoryEditorPage() {
   };
 
   const handleDeleteChapter = (id: number) => {
-    const updatedChapters = chapters.filter(chapter => chapter.id !== id);
-    setChapters(updatedChapters);
-    if (selectedChapter.id === id && updatedChapters.length > 0) {
-      setSelectedChapter(updatedChapters[0]);
-    }
+    // const updatedChapters = chapters.filter(chapter => chapter.id !== id);
+    // setChapters(updatedChapters);
+    // if (selectedChapter.id === id && updatedChapters.length > 0) {
+    //   setSelectedChapter(updatedChapters[0]);
+    // }
   };
 
   const handleChapterSelect = (chapter: Chapter) => {
@@ -200,10 +251,48 @@ export default function StoryEditorPage() {
     setSelectedChapter({ ...selectedChapter, content });
   };
 
-  const wordCount = selectedChapter.content.replace(/\s/g, '').length;
+  const wordCount = selectedChapter?.content?.replace(/\s/g, '').length || 0;
+
+  // 假设 storyId 固定为 1，可根据实际传参
+  const handleSave = async () => {
+    if (!selectedChapter || !currentStory?.id) return;
+    setIsSaving(true);
+    setIsPageLoading(true);
+    try {
+      if (!selectedChapter.story_content_id) {
+        // 新建
+        const res = await createStoryContent({
+          story_id: currentStory.id,
+          outline_title: selectedChapter.title,
+          content: editor?.getText() || '',
+        });
+        // 更新章节story_content_id
+        setChapters(prev => prev.map(chap => chap.id === selectedChapter.id ? { ...chap, story_content_id: res.id } : chap));
+        setSelectedChapter(prev => prev ? { ...prev, story_content_id: res.id } : prev);
+        toast.success('保存成功');
+      } else {
+        // 修改
+        await updateStoryContent(selectedChapter.story_content_id, {
+          outline_title: selectedChapter.title,
+          content: editor?.getText() || '',
+        });
+        toast.success('保存成功');
+      }
+    } catch (e: any) {
+      toast.error(typeof e === 'string' ? e : e?.message || '保存失败');
+    } finally {
+      setIsSaving(false);
+      setIsPageLoading(false);
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
+      {isPageLoading && (
+        <div className="loading-overlay">
+          <Loading size="lg" text="加载中..." />
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between px-8 py-4 border-b border-gray-200 bg-white shadow-sm">
         <div className="flex items-center space-x-4">
@@ -224,7 +313,7 @@ export default function StoryEditorPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar - Chapter List */}
-        <div className="w-80 border-r border-gray-200 bg-gray-50 p-4 rounded-l-lg shadow-md flex flex-col">
+        <div className="w-90 border-r border-gray-200 bg-gray-50 p-4 rounded-l-lg shadow-md flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Pen className="h-5 w-5" style={{ color: 'linear-gradient(90deg, #FF7A00 0%, #A259FF 100%)', background: 'linear-gradient(90deg, #FF7A00 0%, #A259FF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} />
@@ -318,6 +407,11 @@ export default function StoryEditorPage() {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col bg-white rounded-r-lg shadow-md p-0 relative">
+          {isContentLoading && !isPageLoading && (
+            <div className="loading-block-overlay">
+              <Loading size="md" text="章节内容加载中..." />
+            </div>
+          )}
           {/* Editor Toolbar */}
           <div className="border-b border-gray-200 bg-white px-6 py-2 flex items-center gap-2 sticky top-0 z-10">
             <button onClick={() => editor?.chain().focus().toggleBold().run()} disabled={!editor?.can().chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'text-green-600 font-bold' : 'text-gray-600'} title="加粗"><Bold className="h-4 w-4" /></button>
@@ -327,11 +421,23 @@ export default function StoryEditorPage() {
             <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={editor?.isActive('orderedList') ? 'text-green-600 font-bold' : 'text-gray-600'} title="有序列表"><ListOrdered className="h-4 w-4" /></button>
             <button onClick={() => editor?.chain().focus().undo().run()} className="text-gray-600" title="撤销"><Undo className="h-4 w-4" /></button>
             <button onClick={() => editor?.chain().focus().redo().run()} className="text-gray-600" title="重做"><Redo className="h-4 w-4" /></button>
+            <div className="flex-1" />
+            <button
+              className="ml-4 px-6 py-2 rounded-full text-white font-bold text-base"
+              style={{
+                background: 'linear-gradient(90deg, #22b07d 0%, #3ad6a5 100%)',
+                minWidth: 80,
+              }}
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? '保存中...' : (selectedChapter?.story_content_id ? '保存修改' : '保存')}
+            </button>
           </div>
 
           {/* Chapter Title */}
           <div className="px-8 pt-6 pb-2">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-left tracking-tight">{selectedChapter.title}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-left tracking-tight">{selectedChapter?.title || ''}</h2>
           </div>
 
           {/* Text Editor */}
