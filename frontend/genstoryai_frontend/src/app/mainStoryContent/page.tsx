@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Pen,
   Plus,
@@ -65,6 +66,9 @@ export default function StoryEditorPage() {
   const { currentStory } = useStoryStore();
   // 章节内容缓存，避免重复请求
   const contentCache = useRef<Record<number, string>>({});
+  const [editingChapterId, setEditingChapterId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDesc, setEditDesc] = useState('');
 
   // 页面加载时获取章节列表
   useEffect(() => {
@@ -215,6 +219,7 @@ export default function StoryEditorPage() {
       title: `第${chapters.length + 1}章`,
       description: "新章节描述",
       content: "",
+      story_content_id: null,
     };
     setChapters(prev => {
       setTimeout(() => {
@@ -227,6 +232,49 @@ export default function StoryEditorPage() {
       return [...prev, newChapter];
     });
     setSelectedChapter(newChapter);
+    setEditingChapterId(newChapter.id);
+    setEditTitle(newChapter.title);
+    setEditDesc(newChapter.description);
+  };
+
+  const handleEditChapter = (chapter: Chapter) => {
+    setEditingChapterId(chapter.id);
+    setEditTitle(chapter.title);
+    setEditDesc(chapter.description);
+  };
+
+  const handleSaveChapter = async (chapter: Chapter) => {
+    if (!editTitle.trim() || !editDesc.trim()) {
+      toast.error('标题和描述不能为空');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      if (!chapter.story_content_id) {
+        // 新建
+        const res = await createStoryContent({
+          story_id: currentStory.id,
+          outline_title: editTitle,
+          content: chapter.content,
+        });
+        setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, title: editTitle, description: editDesc, story_content_id: res.id } : c));
+        if (selectedChapter?.id === chapter.id) setSelectedChapter({ ...chapter, title: editTitle, description: editDesc, story_content_id: res.id });
+      } else {
+        // 修改
+        await updateStoryContent(chapter.story_content_id, {
+          outline_title: editTitle,
+          content: chapter.content,
+        });
+        setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, title: editTitle, description: editDesc } : c));
+        if (selectedChapter?.id === chapter.id) setSelectedChapter({ ...chapter, title: editTitle, description: editDesc });
+      }
+      setEditingChapterId(null);
+      toast.success('保存成功');
+    } catch (e: any) {
+      toast.error(typeof e === 'string' ? e : e?.message || '保存失败');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteChapter = (id: number) => {
@@ -342,61 +390,50 @@ export default function StoryEditorPage() {
                   <CardContent className="p-3">
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-semibold text-gray-900 text-base truncate">
-                          {chapter.title}
-                        </h3>
-                        <button
-                          className="flex items-center gap-1 text-green-500 hover:text-green-600 font-medium text-base px-2 py-0 rounded transition-colors border-none bg-none outline-none focus:outline-none"
-                          style={{ background: 'none', border: 'none' }}
-                          onClick={e => {
-                            e.stopPropagation();
-                            streamContent(chapter.id, chapter.title, chapter.content);
-                          }}
-                          disabled={isGenerating}
-                        >
-                          <span style={{ display: 'inline-flex', alignItems: 'center', marginRight: 2 }}>
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: 2 }}>
-                              <path d="M9 2L10.09 6.26L14.18 6.27L10.91 8.74L12 13L9 10.52L6 13L7.09 8.74L3.82 6.27L7.91 6.26L9 2Z" fill="url(#paint0_linear)"/>
-                              <defs>
-                                <linearGradient id="paint0_linear" x1="3" y1="2" x2="15" y2="13" gradientUnits="userSpaceOnUse">
-                                  <stop stopColor="#FF7A00"/>
-                                  <stop offset="1" stopColor="#A259FF"/>
-                                </linearGradient>
-                              </defs>
-                            </svg>
-                          </span>
-                          <span>生成正文</span>
-                        </button>
+                        <div className="flex-1 min-w-0">
+                          {editingChapterId === chapter.id ? (
+                            <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="font-semibold text-gray-900 text-base truncate" placeholder="请输入章节标题" />
+                          ) : (
+                            <h3 className="font-semibold text-gray-900 text-base truncate">{chapter.title}</h3>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2 ml-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1 h-7 w-7"
+                            onClick={e => {
+                              e.stopPropagation();
+                              if (editingChapterId === chapter.id) {
+                                handleSaveChapter(chapter);
+                              } else {
+                                handleEditChapter(chapter);
+                              }
+                            }}
+                            disabled={isSaving}
+                            title={editingChapterId === chapter.id ? '保存' : '编辑章节'}
+                          >
+                            {editingChapterId === chapter.id ? <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> : <Edit className="h-4 w-4" />}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 h-7 w-7"
+                            onClick={e => {
+                              e.stopPropagation();
+                              handleDeleteChapter(chapter.id);
+                            }}
+                            title="删除章节"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-2">
-                        {chapter.description}
-                      </p >
-                      <div className="flex justify-end space-x-2 mt-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 p-1 h-7 w-7"
-                          title="编辑章节"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // TODO: 实现编辑章节功能
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 h-7 w-7"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteChapter(chapter.id);
-                          }}
-                          title="删除章节"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      {editingChapterId === chapter.id ? (
+                        <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} className="w-full text-gray-600 text-sm mb-2 rounded border border-gray-300 p-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-200" rows={3} placeholder="章节描述" />
+                      ) : (
+                        <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-2">{chapter.description}</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

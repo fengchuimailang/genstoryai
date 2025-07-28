@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { deleteStory } from '@/api/story-api';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
+import { useStoryStore } from '@/lib/store';
 const stats = [
   { value: "5", unit: "天", label: "制作天数", highlight: true },
   { value: "1.8", unit: "万", label: "总字数" },
@@ -31,6 +32,7 @@ export default function HomePage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [storyToDelete, setStoryToDelete] = useState<any>(null);
   const navigate = useNavigate();
+  const { setCurrentStory } = useStoryStore();
 
   // 获取故事列表
   const fetchStories = async (params?: { page?: number; search?: string }) => {
@@ -174,7 +176,7 @@ export default function HomePage() {
                   <div className="w-100 text-center text-gray-400 text-sm">{story.version_time}</div>
                   <div className="w-32 flex items-center justify-center gap-2">
                     <button className="text-gray-400 hover:text-red-500" title="删除" onClick={() => { setStoryToDelete(story); setDeleteDialogOpen(true); }}><Trash2 className="w-4 h-4" /></button>
-                    <button className="text-gray-400 hover:text-blue-500" title="编辑" onClick={() => navigate(`/MainStoryContent?storyId=${story.id}`)}><Edit className="w-4 h-4" /></button>
+                    <button className="text-gray-400 hover:text-blue-500" title="编辑" onClick={() => { setCurrentStory(story); navigate(`/MainStoryContent?storyId=${story.id}`); }}><Edit className="w-4 h-4" /></button>
                     <button className="text-gray-400 hover:text-green-500" title="查看"><Eye className="w-4 h-4" /></button>
                   </div>
                 </div>
