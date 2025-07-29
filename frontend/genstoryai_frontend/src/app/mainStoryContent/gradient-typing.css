@@ -1,0 +1,13 @@
+.gradient-typing {
+  background: linear-gradient(90deg, #FF7A00, #A259FF, #00FFA3, #FF7A00, #FF4E50, #1CB5E0, #FF7A00);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-move 0.8s linear infinite;
+}
+@keyframes gradient-move {
+  0% { background-position: 0% 50%;}
+  100% { background-position: 100% 50%;}
+} 
