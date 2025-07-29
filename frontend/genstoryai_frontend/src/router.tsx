@@ -7,6 +7,7 @@ import HomePage from './app/home/home';
 import TestPage from './app/test/page';
 import VerifyEmailPage from './app/verify-email/page';
 import GenerationPage from './app/Generation/page';
+import MainStoryContent from "./app/mainStoryContent/page";
 
 // 受保护的路由组件
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -73,6 +74,14 @@ const AppRouter = () => {
           element={
             <ProtectedRoute>
               <GenerationPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/MainStoryContent" 
+          element={
+            <ProtectedRoute>
+              <MainStoryContent />
             </ProtectedRoute>
           } 
         />
