@@ -186,7 +186,7 @@ export default function StoryEditorPage() {
           const before = accumulated.slice(0, start);
           const highlight = accumulated.slice(start);
           const html = `${before}<span class="gradient-typing">${highlight}</span>`;
-          editor?.commands.setContent(html, { emitUpdate: false });
+          editor?.commands.setContent(html, false);
           i++;
           if (i >= fullContent.length) {
             typingIntervalRef.current && clearInterval(typingIntervalRef.current);
